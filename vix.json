@@ -102,7 +102,7 @@
       "proxy_reload": true,
       "logs_on_failure": true,
       "log_lines": 120,
-      "rollback": false
+      "rollback": true
     }
   },
   "tasks": {

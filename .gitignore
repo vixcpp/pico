@@ -21,4 +21,6 @@ cmd.md
 .vix/
 
 .env
-storage/
+storage/*
+!storage/
+!storage/.gitkeep
