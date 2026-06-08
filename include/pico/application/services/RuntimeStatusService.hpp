@@ -89,6 +89,13 @@ namespace pico::application::services
     [[nodiscard]] std::int64_t increment_ws_messages();
 
     /**
+     * @brief Returns the WebSocket message counter.
+     *
+     * @return Current WebSocket message counter value.
+     */
+    [[nodiscard]] std::int64_t ws_messages() const;
+
+    /**
      * @brief Returns the application uptime in seconds.
      *
      * @return Number of seconds since service construction.

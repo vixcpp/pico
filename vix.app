@@ -21,6 +21,7 @@ sources = [
   "src/pico/infrastructure/database/EventRepository.cpp",
   "src/pico/infrastructure/kv/PicoKvStore.cpp",
   "src/pico/infrastructure/threadpool/PicoThreadPool.cpp",
+  "src/pico/infrastructure/websocket/PicoWebSocketServer.cpp",
 
   "src/pico/application/services/EventService.cpp",
   "src/pico/application/services/JobService.cpp",
@@ -41,6 +42,12 @@ sources = [
 include_dirs = [
   "include",
   "src",
+]
+
+deps = [
+  "rix/rix",
+  "rix/csv",
+  "rix/debug"
 ]
 
 defines = [

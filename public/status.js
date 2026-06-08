@@ -4,7 +4,7 @@ async function refreshStatus() {
 
   try {
     const response = await fetch("/api/health", {
-      headers: { "Accept": "application/json" }
+      headers: { Accept: "application/json" },
     });
 
     if (!response.ok) {

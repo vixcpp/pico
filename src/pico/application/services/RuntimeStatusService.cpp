@@ -71,6 +71,11 @@ namespace pico::application::services
     return kv_->increment("ws/messages");
   }
 
+  std::int64_t RuntimeStatusService::ws_messages() const
+  {
+    return kv_->counter("ws/messages");
+  }
+
   std::int64_t RuntimeStatusService::uptime_seconds() const
   {
     const auto now = std::chrono::steady_clock::now();

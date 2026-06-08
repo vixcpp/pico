@@ -1,66 +1,598 @@
 :root {
-  color-scheme: light dark;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0b0e14;
-  color: #f7f7f8;
+  --pico-bg: #f6f7fb;
+  --pico-surface: #ffffff;
+  --pico-surface-soft: #f9fafc;
+  --pico-text: #111827;
+  --pico-muted: #6b7280;
+  --pico-border: #e5e7eb;
+  --pico-border-strong: #d1d5db;
+  --pico-primary: #ff9900;
+  --pico-primary-dark: #d97706;
+  --pico-primary-soft: #fff3df;
+  --pico-success: #16a34a;
+  --pico-danger: #dc2626;
+  --pico-radius: 18px;
+  --pico-radius-sm: 12px;
+  --pico-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  --pico-header-height: 72px;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
 }
 
-.page {
-  min-height: 100vh;
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 153, 0, 0.12),
+      transparent 32rem
+    ),
+    linear-gradient(180deg, #ffffff 0%, var(--pico-bg) 42%);
+  color: var(--pico-text);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+strong {
+  font-weight: 750;
+}
+
+.pico-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.pico-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--pico-header-height);
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  gap: 24px;
+}
+
+.pico-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.pico-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--pico-primary);
+  color: #111827;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(255, 153, 0, 0.34);
+}
+
+.pico-brand-text {
+  font-size: 1.05rem;
+}
+
+.pico-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pico-nav-links a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--pico-muted);
+  font-size: 0.93rem;
+  font-weight: 650;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.pico-nav-links a:hover,
+.pico-nav-links a[aria-current="page"] {
+  background: var(--pico-primary-soft);
+  color: var(--pico-text);
+}
+
+.pico-main {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 56px 0 72px;
+}
+
+.pico-hero {
   display: grid;
-  place-items: center;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+  gap: 28px;
+  align-items: center;
+  min-height: calc(100vh - var(--pico-header-height) - 96px);
+}
+
+.pico-hero-content {
+  max-width: 760px;
+}
+
+.pico-eyebrow {
+  margin: 0 0 12px;
+  color: var(--pico-primary-dark);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pico-hero h1,
+.pico-page-title h1 {
+  margin: 0;
+  color: var(--pico-text);
+  font-size: clamp(2.6rem, 8vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.08em;
+}
+
+.pico-hero-text,
+.pico-page-title p,
+.pico-section-heading p,
+.pico-muted {
+  color: var(--pico-muted);
+}
+
+.pico-hero-text {
+  max-width: 680px;
+  margin: 24px 0 0;
+  font-size: clamp(1.02rem, 2vw, 1.22rem);
+}
+
+.pico-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.pico-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 750;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.pico-button:hover {
+  transform: translateY(-1px);
+}
+
+.pico-button-primary {
+  background: var(--pico-primary);
+  color: #111827;
+  box-shadow: 0 12px 28px rgba(255, 153, 0, 0.32);
+}
+
+.pico-button-primary:hover {
+  background: #ffa928;
+}
+
+.pico-button-secondary {
+  border-color: var(--pico-border-strong);
+  background: var(--pico-surface);
+  color: var(--pico-text);
+}
+
+.pico-button-secondary:hover {
+  border-color: var(--pico-primary);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.pico-card,
+.pico-metric-card {
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  border-radius: var(--pico-radius);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--pico-shadow);
+}
+
+.pico-card {
   padding: 24px;
 }
 
-.card {
-  width: min(720px, 100%);
-  padding: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+.pico-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.08rem;
+  letter-spacing: -0.03em;
 }
 
-.eyebrow {
-  margin: 0 0 12px;
-  color: #ff9900;
+.pico-card p {
+  margin: 0;
+  color: var(--pico-muted);
+}
+
+.pico-runtime-card {
+  align-self: stretch;
+}
+
+.pico-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-weight: 800;
+}
+
+.pico-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pico-success);
+  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
+}
+
+.pico-runtime-list,
+.pico-detail-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.pico-runtime-list div,
+.pico-detail-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--pico-border);
+}
+
+.pico-runtime-list div:last-child,
+.pico-detail-list div:last-child {
+  border-bottom: 0;
+}
+
+.pico-runtime-list dt,
+.pico-detail-list dt {
+  color: var(--pico-muted);
+  font-size: 0.9rem;
+}
+
+.pico-runtime-list dd,
+.pico-detail-list dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+}
+
+.pico-section {
+  margin-top: 72px;
+}
+
+.pico-section-heading {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.pico-section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.06em;
+}
+
+.pico-section-heading p {
+  margin-bottom: 10px;
+}
+
+.pico-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pico-endpoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pico-endpoints a {
+  padding: 10px 13px;
+  border: 1px solid var(--pico-border);
+  border-radius: 999px;
+  background: var(--pico-surface);
+  color: var(--pico-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
   font-weight: 700;
+}
+
+.pico-endpoints a:hover {
+  border-color: var(--pico-primary);
+  color: var(--pico-text);
+}
+
+.pico-page-title {
+  padding: 24px 0 8px;
+}
+
+.pico-page-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.pico-page-title h1 {
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
+}
+
+.pico-page-title p {
+  max-width: 720px;
+  margin: 18px 0 0;
+  font-size: 1.05rem;
+}
+
+.pico-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pico-metric-card {
+  padding: 18px;
+}
+
+.pico-metric-label {
+  display: block;
+  color: var(--pico-muted);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.pico-metric-value {
+  display: block;
+  margin-top: 8px;
+  color: var(--pico-text);
+  font-size: clamp(1.45rem, 3vw, 2.25rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.pico-metric-note {
+  display: block;
+  margin-top: 10px;
+  color: var(--pico-muted);
+  font-size: 0.78rem;
+}
+
+.pico-two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pico-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.pico-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--pico-muted);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.pico-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--pico-border-strong);
+  border-radius: var(--pico-radius-sm);
+  background: var(--pico-surface-soft);
+  color: var(--pico-text);
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.pico-form input:focus {
+  border-color: var(--pico-primary);
+  background: var(--pico-surface);
+  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.14);
+}
+
+.pico-output {
+  overflow: auto;
+  min-height: 110px;
+  max-height: 340px;
+  margin: 18px 0 0;
+  padding: 16px;
+  border: 1px solid var(--pico-border);
+  border-radius: var(--pico-radius-sm);
+  background: #0f172a;
+  color: #dbeafe;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.pico-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pico-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.pico-table th,
+.pico-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--pico-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.pico-table th {
+  color: var(--pico-muted);
+  font-size: 0.78rem;
+  font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-h1 {
+.pico-table td {
+  color: var(--pico-text);
+}
+
+.pico-table td:nth-child(4) {
+  max-width: 420px;
+  color: var(--pico-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.82rem;
+  word-break: break-word;
+}
+
+.pico-footer {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 44px;
+  border-top: 1px solid var(--pico-border);
+  color: var(--pico-muted);
+  text-align: center;
+}
+
+.pico-footer p {
   margin: 0;
-  font-size: clamp(2.2rem, 8vw, 5rem);
-  line-height: 1;
 }
 
-p {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.78);
+@media (max-width: 980px) {
+  .pico-hero,
+  .pico-two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .pico-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pico-metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 24px;
-}
+@media (max-width: 720px) {
+  :root {
+    --pico-header-height: auto;
+  }
 
-.actions a {
-  color: #0b0e14;
-  background: #ff9900;
-  padding: 10px 16px;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 700;
+  .pico-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 0;
+    gap: 12px;
+  }
+
+  .pico-nav-links {
+    justify-content: flex-start;
+  }
+
+  .pico-main {
+    padding-top: 38px;
+  }
+
+  .pico-hero {
+    min-height: auto;
+  }
+
+  .pico-page-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pico-grid,
+  .pico-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pico-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pico-button {
+    width: 100%;
+  }
+
+  .pico-runtime-list div,
+  .pico-detail-list div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pico-runtime-list dd,
+  .pico-detail-list dd {
+    text-align: left;
+  }
+
+  .pico-card {
+    padding: 20px;
+  }
 }

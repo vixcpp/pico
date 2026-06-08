@@ -23,6 +23,7 @@
 #include <pico/infrastructure/database/EventRepository.hpp>
 #include <pico/infrastructure/kv/PicoKvStore.hpp>
 #include <pico/infrastructure/threadpool/PicoThreadPool.hpp>
+#include <pico/infrastructure/websocket/PicoWebSocketServer.hpp>
 #include <pico/presentation/middleware/MiddlewareRegistry.hpp>
 #include <pico/presentation/routes/RouteRegistry.hpp>
 
@@ -36,6 +37,7 @@
 #include <vix/middleware/app/adapter.hpp>
 #include <vix/middleware/performance/compression.hpp>
 #include <vix/middleware/performance/static_compression.hpp>
+#include <vix/websocket/AttachedRuntime.hpp>
 
 namespace pico::app
 {
@@ -77,6 +79,7 @@ namespace pico::app
       const std::string public_path = config_string(cfg, "public.path", "public");
       const std::string public_mount = config_string(cfg, "public.mount", "/");
       const std::string public_index = config_string(cfg, "public.index", "index.html");
+
       const std::string public_cache_control = config_string(
           cfg,
           "public.cache_control",
@@ -101,6 +104,11 @@ namespace pico::app
           cfg,
           "database.sqlite_path",
           "storage/pico.db");
+
+      const bool websocket_enabled = config_bool(
+          cfg,
+          "websocket.enabled",
+          false);
 
       infrastructure::database::DatabaseProvider database{database_path};
       database.open();
@@ -170,7 +178,24 @@ namespace pico::app
 
       vix::log::info("Starting Pico on port {}", cfg.getServerPort());
 
-      app.run(cfg);
+      if (websocket_enabled)
+      {
+        infrastructure::websocket::PicoWebSocketServer websocket_server{
+            cfg,
+            runtime_status,
+            events};
+
+        vix::run_http_and_ws(
+            app,
+            websocket_server.server(),
+            websocket_server.executor(),
+            cfg);
+      }
+      else
+      {
+        vix::log::warn("Pico WebSocket server is disabled");
+        app.run(cfg);
+      }
 
       pool.wait_idle();
       pool.shutdown();

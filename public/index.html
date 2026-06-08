@@ -3,21 +3,172 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pico</title>
+
+    <title>Pico · Vix.cpp Runtime App</title>
+
+    <meta
+      name="description"
+      content="Pico is a small production-style Vix.cpp backend used to test HTTP routes, static files, KV storage, SQLite events, background jobs, and WebSocket runtime behavior."
+    />
+
     <link rel="stylesheet" href="/app.css" />
   </head>
+
   <body>
-    <main class="page">
-      <section class="card">
-        <p class="eyebrow">Vix backend</p>
-        <h1>pico</h1>
-        <p>Your production-oriented Vix backend is running.</p>
-        <div class="actions">
-          <a href="/api">API</a>
-          <a href="/health">Health</a>
+    <header class="pico-header">
+      <nav class="pico-nav" aria-label="Main navigation">
+        <a class="pico-brand" href="/">
+          <span class="pico-brand-mark">P</span>
+          <span class="pico-brand-text">Pico</span>
+        </a>
+
+        <div class="pico-nav-links">
+          <a href="/">Home</a>
+          <a href="/status.html">Status</a>
+          <a href="/api/health">API Health</a>
+          <a href="/api/status">Runtime JSON</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="pico-main">
+      <section class="pico-hero">
+        <div class="pico-hero-content">
+          <p class="pico-eyebrow">Vix.cpp production test app</p>
+
+          <h1>Small app. Real runtime.</h1>
+
+          <p class="pico-hero-text">
+            Pico is a compact backend application built with Vix.cpp. It is used
+            to test real application features such as HTTP routing, static
+            files, middleware, SQLite events, durable KV state, background jobs,
+            and WebSocket diagnostics.
+          </p>
+
+          <div class="pico-actions">
+            <a class="pico-button pico-button-primary" href="/status.html">
+              Open status page
+            </a>
+
+            <a class="pico-button pico-button-secondary" href="/api/status">
+              View API status
+            </a>
+          </div>
+        </div>
+
+        <aside class="pico-card pico-runtime-card" aria-label="Runtime summary">
+          <div class="pico-card-header">
+            <span class="pico-status-dot"></span>
+            <span>Runtime</span>
+          </div>
+
+          <dl class="pico-runtime-list">
+            <div>
+              <dt>Framework</dt>
+              <dd>Vix.cpp</dd>
+            </div>
+
+            <div>
+              <dt>HTTP</dt>
+              <dd>Port 8080</dd>
+            </div>
+
+            <div>
+              <dt>WebSocket</dt>
+              <dd>Port 9090</dd>
+            </div>
+
+            <div>
+              <dt>Storage</dt>
+              <dd>KV + SQLite</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="pico-section" aria-labelledby="features-title">
+        <div class="pico-section-heading">
+          <p class="pico-eyebrow">What Pico checks</p>
+          <h2 id="features-title">Runtime features connected in one app</h2>
+        </div>
+
+        <div class="pico-grid">
+          <article class="pico-card">
+            <h3>HTTP routes</h3>
+            <p>
+              Pico exposes health, status, KV, event, job, and WebSocket
+              diagnostic routes through the Vix application router.
+            </p>
+          </article>
+
+          <article class="pico-card">
+            <h3>Static files</h3>
+            <p>
+              This page is served from the public directory through the Vix
+              static file system.
+            </p>
+          </article>
+
+          <article class="pico-card">
+            <h3>Durable KV</h3>
+            <p>
+              Runtime counters such as boot count, HTTP requests, WebSocket
+              messages, and job runs are persisted through Vix KV.
+            </p>
+          </article>
+
+          <article class="pico-card">
+            <h3>SQLite events</h3>
+            <p>
+              Runtime events are stored in SQLite so Pico can observe what
+              happened during requests, jobs, and WebSocket activity.
+            </p>
+          </article>
+
+          <article class="pico-card">
+            <h3>ThreadPool jobs</h3>
+            <p>
+              Pico submits diagnostic work to the Vix ThreadPool and exposes
+              worker metrics through the status API.
+            </p>
+          </article>
+
+          <article class="pico-card">
+            <h3>WebSocket runtime</h3>
+            <p>
+              Pico prepares a WebSocket server and lets Vix AttachedRuntime run
+              HTTP and WebSocket together under one lifecycle.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="pico-section" aria-labelledby="api-title">
+        <div class="pico-section-heading">
+          <p class="pico-eyebrow">Quick links</p>
+          <h2 id="api-title">Useful endpoints</h2>
+        </div>
+
+        <div class="pico-endpoints">
+          <a href="/api">GET /api</a>
+          <a href="/health">GET /health</a>
+          <a href="/api/health">GET /api/health</a>
+          <a href="/api/status">GET /api/status</a>
+          <a href="/api/threadpool">GET /api/threadpool</a>
+          <a href="/api/events">GET /api/events</a>
+          <a href="/api/ws/info">GET /api/ws/info</a>
+          <a href="/api/ws/metrics">GET /api/ws/metrics</a>
         </div>
       </section>
     </main>
-    <script src="/app.js"></script>
+
+    <footer class="pico-footer">
+      <p>
+        Pico is powered by
+        <strong>Vix.cpp</strong>.
+      </p>
+    </footer>
+
+    <script src="/app.js" defer></script>
   </body>
 </html>

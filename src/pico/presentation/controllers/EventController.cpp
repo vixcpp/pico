@@ -18,6 +18,7 @@
 #include <pico/support/JsonHelpers.hpp>
 #include <string>
 #include <vix/json.hpp>
+#include <rix.hpp>
 
 namespace pico::presentation::controllers
 {
@@ -77,5 +78,31 @@ namespace pico::presentation::controllers
                        "type", type,
                        "payload", payload));
              });
+
+    app.get("/api/events.csv",
+            [&events](vix::Request &, vix::Response &res)
+            {
+              const auto latest_events = events.latest(100);
+
+              rixlib::csv::Table table{};
+              table.push_back({"id", "source", "type", "payload", "created_at"});
+
+              for (const auto &event : latest_events)
+              {
+                table.push_back({
+                    std::to_string(event.id),
+                    event.source,
+                    event.type,
+                    event.payload,
+                    event.created_at,
+                });
+              }
+
+              const std::string csv = rix.csv.write(table);
+
+              res.header("Content-Type", "text/csv; charset=utf-8");
+              res.header("Content-Disposition", "attachment; filename=\"pico-events.csv\"");
+              res.send(csv);
+            });
   }
 }

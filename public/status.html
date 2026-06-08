@@ -3,22 +3,322 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pico status</title>
-    <link rel="stylesheet" href="/status.css" />
+
+    <title>Pico Status · Vix.cpp Runtime App</title>
+
+    <meta
+      name="description"
+      content="Runtime dashboard for Pico, a Vix.cpp production-style test application."
+    />
+
+    <link rel="stylesheet" href="/app.css" />
   </head>
+
   <body>
-    <main class="status-page">
-      <section class="status-card">
-        <p class="eyebrow">Vix backend status</p>
-        <h1>pico</h1>
-        <p class="status-line" id="status-line">Checking service status...</p>
-        <div class="status-grid">
+    <header class="pico-header">
+      <nav class="pico-nav" aria-label="Main navigation">
+        <a class="pico-brand" href="/">
+          <span class="pico-brand-mark">P</span>
+          <span class="pico-brand-text">Pico</span>
+        </a>
+
+        <div class="pico-nav-links">
           <a href="/">Home</a>
-          <a href="/health">Health</a>
-          <a href="/api/health">API Health</a>
+          <a href="/status.html" aria-current="page">Status</a>
+          <a href="/api/status">Runtime JSON</a>
+          <a href="/api/events">Events JSON</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="pico-main">
+      <section class="pico-page-title">
+        <p class="pico-eyebrow">Runtime dashboard</p>
+
+        <div class="pico-page-title-row">
+          <div>
+            <h1>Pico status</h1>
+            <p>
+              Observe the HTTP runtime, durable KV counters, SQLite events,
+              ThreadPool metrics, and WebSocket diagnostics from one page.
+            </p>
+          </div>
+
+          <button class="pico-button pico-button-primary" id="refresh-status">
+            Refresh
+          </button>
         </div>
       </section>
+
+      <section class="pico-section" aria-labelledby="overview-title">
+        <div class="pico-section-heading">
+          <p class="pico-eyebrow">Overview</p>
+          <h2 id="overview-title">Runtime snapshot</h2>
+        </div>
+
+        <div class="pico-metrics-grid">
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">Health</span>
+            <strong class="pico-metric-value" id="metric-health"
+              >Loading</strong
+            >
+            <span class="pico-metric-note" id="metric-health-note">
+              Waiting for /api/health
+            </span>
+          </article>
+
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">Uptime</span>
+            <strong class="pico-metric-value" id="metric-uptime">—</strong>
+            <span class="pico-metric-note">seconds</span>
+          </article>
+
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">Boot count</span>
+            <strong class="pico-metric-value" id="metric-boot-count">—</strong>
+            <span class="pico-metric-note">persisted in KV</span>
+          </article>
+
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">Events</span>
+            <strong class="pico-metric-value" id="metric-events">—</strong>
+            <span class="pico-metric-note">stored in SQLite</span>
+          </article>
+
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">HTTP requests</span>
+            <strong class="pico-metric-value" id="metric-http">—</strong>
+            <span class="pico-metric-note">durable counter</span>
+          </article>
+
+          <article class="pico-metric-card">
+            <span class="pico-metric-label">WebSocket messages</span>
+            <strong class="pico-metric-value" id="metric-ws">—</strong>
+            <span class="pico-metric-note">runtime counter</span>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="pico-section pico-two-columns"
+        aria-label="Runtime details"
+      >
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span class="pico-status-dot"></span>
+            <span>Application runtime</span>
+          </div>
+
+          <dl class="pico-detail-list">
+            <div>
+              <dt>App</dt>
+              <dd id="detail-app">—</dd>
+            </div>
+
+            <div>
+              <dt>Runtime</dt>
+              <dd id="detail-runtime">—</dd>
+            </div>
+
+            <div>
+              <dt>Status</dt>
+              <dd id="detail-status">—</dd>
+            </div>
+
+            <div>
+              <dt>Last heartbeat</dt>
+              <dd id="detail-heartbeat">—</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span class="pico-status-dot"></span>
+            <span>ThreadPool</span>
+          </div>
+
+          <dl class="pico-detail-list">
+            <div>
+              <dt>Running</dt>
+              <dd id="threadpool-running">—</dd>
+            </div>
+
+            <div>
+              <dt>Workers</dt>
+              <dd id="threadpool-workers">—</dd>
+            </div>
+
+            <div>
+              <dt>Pending</dt>
+              <dd id="threadpool-pending">—</dd>
+            </div>
+
+            <div>
+              <dt>Completed</dt>
+              <dd id="threadpool-completed">—</dd>
+            </div>
+
+            <div>
+              <dt>Failed</dt>
+              <dd id="threadpool-failed">—</dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+
+      <section
+        class="pico-section pico-two-columns"
+        aria-label="Interactive checks"
+      >
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span>KV check</span>
+          </div>
+
+          <p class="pico-muted">
+            Write a value to Pico's durable KV store, then read it back through
+            the API.
+          </p>
+
+          <form class="pico-form" id="kv-form">
+            <label>
+              Key
+              <input
+                id="kv-key"
+                name="key"
+                type="text"
+                value="demo-status-message"
+                autocomplete="off"
+              />
+            </label>
+
+            <label>
+              Value
+              <input
+                id="kv-value"
+                name="value"
+                type="text"
+                value="Hello from Pico status page"
+                autocomplete="off"
+              />
+            </label>
+
+            <button class="pico-button pico-button-secondary" type="submit">
+              Write and read KV
+            </button>
+          </form>
+
+          <pre class="pico-output" id="kv-output">Waiting for KV test…</pre>
+        </article>
+
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span>Job check</span>
+          </div>
+
+          <p class="pico-muted">
+            Submit a small diagnostic job to the Vix ThreadPool through Pico's
+            job service.
+          </p>
+
+          <form class="pico-form" id="job-form">
+            <label>
+              Job name
+              <input
+                id="job-name"
+                name="name"
+                type="text"
+                value="status-page-job"
+                autocomplete="off"
+              />
+            </label>
+
+            <label>
+              Value
+              <input id="job-value" name="value" type="number" value="21" />
+            </label>
+
+            <button class="pico-button pico-button-secondary" type="submit">
+              Run job
+            </button>
+          </form>
+
+          <pre class="pico-output" id="job-output">Waiting for job test…</pre>
+        </article>
+      </section>
+
+      <section class="pico-section" aria-labelledby="ws-title">
+        <div class="pico-section-heading">
+          <p class="pico-eyebrow">Realtime</p>
+          <h2 id="ws-title">WebSocket diagnostics</h2>
+        </div>
+
+        <article class="pico-card">
+          <p class="pico-muted">
+            Pico exposes WebSocket diagnostic endpoints and can connect to the
+            Vix WebSocket runtime when enabled.
+          </p>
+
+          <div class="pico-actions">
+            <button
+              class="pico-button pico-button-secondary"
+              id="ws-info-button"
+            >
+              Load WS info
+            </button>
+
+            <button
+              class="pico-button pico-button-secondary"
+              id="ws-connect-button"
+            >
+              Test WebSocket
+            </button>
+          </div>
+
+          <pre class="pico-output" id="ws-output">
+Waiting for WebSocket check…</pre
+          >
+        </article>
+      </section>
+
+      <section class="pico-section" aria-labelledby="events-title">
+        <div class="pico-section-heading">
+          <p class="pico-eyebrow">SQLite events</p>
+          <h2 id="events-title">Latest runtime events</h2>
+        </div>
+
+        <article class="pico-card">
+          <div class="pico-table-wrap">
+            <table class="pico-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Source</th>
+                  <th>Type</th>
+                  <th>Payload</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+
+              <tbody id="events-table-body">
+                <tr>
+                  <td colspan="5">Loading events…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
     </main>
-    <script src="/status.js"></script>
+
+    <footer class="pico-footer">
+      <p>
+        Pico status page powered by
+        <strong>Vix.cpp</strong>.
+      </p>
+    </footer>
+
+    <script src="/app.js" defer></script>
   </body>
 </html>
