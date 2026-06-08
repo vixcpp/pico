@@ -1,49 +1,58 @@
 # Pico
 
-Pico is a small production-style backend application built with **Vix.cpp**.
+Pico is a production-style runtime validation application built with **Vix.cpp**.
 
-**Website:** https://pico.vixcpp.com \
-**Runtime:** Vix.cpp \
-**Purpose:** production-style validation app for Vix.cpp modules \
+**Website:** https://pico.vixcpp.com
+**Runtime:** Vix.cpp
+**Purpose:** validate Vix.cpp modules inside one real C++ backend application
 
-Pico is not a framework and it is not a separate runtime. It is a real application used to validate how Vix.cpp modules work together in one backend project.
+Pico is not a framework and it is not a separate runtime. It is a real backend application used to verify that Vix.cpp modules work together under a practical application shape.
 
-It is not a framework and it is not a separate runtime. Pico is a real application used to validate how Vix.cpp modules work together in one backend project.
+It connects HTTP routing, middleware, static files, durable KV storage, SQLite events, ThreadPool jobs, WebSocket runtime behavior, runtime metrics, time utilities, filesystem utilities, and Rix CSV export.
 
-Pico currently exercises:
+## Why Pico exists
 
-- `vix::App`
-- HTTP routes
-- middleware
-- public static files
-- `.env` configuration
-- SQLite events
-- durable KV storage
-- ThreadPool jobs
-- WebSocket runtime
-- runtime status metrics
-- `vix/time`
-- Rix CSV export
+Vix.cpp modules should not only compile independently. They should also work together inside a running application with shared configuration, lifecycle, routing, persistence, observability, and diagnostics.
 
-## Purpose
+Pico exists for that purpose.
 
-Pico exists to test Vix.cpp in a realistic backend application.
-
-Instead of testing every module only in isolation, Pico connects multiple Vix modules together:
+It is intentionally small, but it is not a toy example. It is structured like a real backend application:
 
 ```txt
 HTTP app
   -> middleware
   -> routes
-  -> services
-  -> KV
+  -> controllers
+  -> application services
+  -> infrastructure wrappers
+  -> Vix KV
   -> SQLite
   -> ThreadPool
   -> WebSocket
-  -> runtime status dashboard
+  -> runtime dashboard
 ```
 
-This makes Pico useful as a production-oriented validation app for Vix.cpp.
+Pico is used as a production-oriented integration target for Vix.cpp.
+
+## What Pico validates
+
+Pico currently exercises:
+
+- `vix::App`
+- HTTP routing
+- middleware
+- public static files
+- `.env` configuration
+- SQLite persistence
+- durable KV storage
+- runtime metrics
+- `vix/time`
+- `vix/fs`
+- ThreadPool jobs
+- WebSocket runtime
+- Vix AttachedRuntime
+- Rix CSV export
+- browser-based runtime dashboard
 
 ## Quick start
 
@@ -71,27 +80,28 @@ curl http://127.0.0.1:8080/api/status
 
 ## Status dashboard
 
-Pico includes a small browser dashboard:
+Pico includes a browser dashboard:
 
 ```txt
 /status.html
 ```
 
-The dashboard observes:
+The dashboard observes and tests:
 
 - application health
 - uptime
 - boot count
 - HTTP request count
-- WebSocket message count
 - latest heartbeat
+- WebSocket message count
 - SQLite event count
 - ThreadPool metrics
 - KV write/read behavior
 - background job execution
 - WebSocket ping/pong behavior
+- CSV export of runtime events
 
-The page is served from the `public/` directory through Vix static files.
+The dashboard is served from `public/` through the Vix static file handler.
 
 ## Project layout
 
@@ -215,17 +225,18 @@ README.md
 
 ## Architecture
 
-Pico uses a simple layered structure:
+Pico uses a layered backend structure.
 
 ```txt
 domain
   Pure application models.
 
 application
-  Services that coordinate business/runtime behavior.
+  Services that coordinate runtime behavior.
 
 infrastructure
-  Vix-backed technical components such as SQLite, KV, ThreadPool, and WebSocket.
+  Vix-backed technical components such as SQLite, KV, ThreadPool, filesystem,
+  time, and WebSocket runtime.
 
 presentation
   HTTP controllers, middleware, and route registration.
@@ -236,6 +247,8 @@ app
 support
   Shared JSON and HTTP helpers.
 ```
+
+This keeps the runtime wiring explicit while avoiding a monolithic `main.cpp`.
 
 ## Entry point
 
@@ -259,7 +272,7 @@ pico::app::AppBootstrap
 
 ## Application bootstrap
 
-`AppBootstrap` is responsible for wiring the application.
+`AppBootstrap` owns the startup sequence.
 
 It creates and connects:
 
@@ -290,16 +303,18 @@ main.cpp
       -> create ThreadPool
       -> initialize event schema
       -> mark boot count
-      -> register static files
+      -> configure static files
+      -> configure optional compression
       -> register middleware
+      -> register runtime metrics
       -> register routes
       -> run HTTP
-      -> optionally run WebSocket with HTTP
+      -> optionally run HTTP + WebSocket together
 ```
 
 ## Runtime metrics
 
-Pico stores lightweight runtime state in durable KV.
+Pico stores lightweight runtime state in Vix KV.
 
 Current runtime counters include:
 
@@ -335,11 +350,237 @@ Example response:
   "slow_job_runs": 0,
   "events": {
     "total": 53
+  },
+  "threadpool": {
+    "running": true
   }
 }
 ```
 
 The heartbeat is updated through runtime middleware and formatted with `vix/time`.
+
+## Heartbeat model
+
+Pico separates heartbeat state from heartbeat events.
+
+`heartbeat()` updates the durable KV value only.
+
+`record_heartbeat_event()` records a SQLite event when explicit event history is needed.
+
+This avoids polluting the SQLite event table with one heartbeat event per HTTP request while still keeping the latest heartbeat visible in `/api/status`.
+
+## KV corruption recovery
+
+Pico uses Vix KV for diagnostic counters. Since these counters are operational state and not business data, a corrupted local KV store should not permanently prevent Pico from starting.
+
+When the KV store fails to open because of corruption, Pico can move the corrupted store to a backup path and create a fresh KV store.
+
+Expected behavior:
+
+```txt
+storage/kv
+  -> open fails because the KV log is corrupted
+  -> move to storage/kv.corrupted.<timestamp>
+  -> create fresh storage/kv
+  -> continue startup
+```
+
+This protects the runtime validation app from being blocked by local diagnostic-state corruption.
+
+The SQLite database is separate:
+
+```txt
+storage/pico.db
+```
+
+KV recovery should not delete or modify the SQLite event database.
+
+## SQLite events
+
+Pico stores runtime events in SQLite.
+
+The event model contains:
+
+```txt
+id
+source
+type
+payload
+created_at
+```
+
+Common event types:
+
+```txt
+system / app.boot
+kv     / kv.write
+kv     / kv.delete
+job    / job.completed
+job    / job.slow.completed
+ws     / ws.open
+ws     / ws.ping
+ws     / ws.message
+ws     / ws.close
+ws     / ws.error
+```
+
+The latest events are available through:
+
+```txt
+GET /api/events
+```
+
+Example:
+
+```bash
+curl http://127.0.0.1:8080/api/events
+```
+
+## Rix CSV export
+
+Pico uses **Rix CSV** to export SQLite runtime events as CSV.
+
+Rix is the optional userland library layer for Vix.cpp projects. It is separate from the Vix runtime and CLI, but belongs to the same ecosystem.
+
+Vix.cpp provides the runtime, application workflow, and core modules.
+
+Rix provides optional libraries that applications can add when needed.
+
+In Pico:
+
+```txt
+Vix.cpp
+  -> HTTP runtime
+  -> middleware
+  -> KV
+  -> SQLite access
+  -> ThreadPool
+  -> WebSocket
+  -> time
+  -> filesystem
+
+Rix
+  -> CSV export
+
+Pico
+  -> real C++ backend using Vix.cpp + Rix CSV
+```
+
+CSV export endpoint:
+
+```txt
+GET /api/events.csv
+```
+
+Example:
+
+```bash
+curl -i http://127.0.0.1:8080/api/events.csv
+```
+
+Or save it to a file:
+
+```bash
+curl -L http://127.0.0.1:8080/api/events.csv -o pico-events.csv
+```
+
+The endpoint returns:
+
+```txt
+Content-Type: text/csv; charset=utf-8
+Content-Disposition: attachment; filename="pico-events.csv"
+```
+
+## Durable KV
+
+Pico uses Vix KV to persist small runtime values.
+
+Write a value:
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/kv \
+  -H "Content-Type: application/json" \
+  -d '{"key":"demo","value":"hello"}'
+```
+
+Read a value:
+
+```bash
+curl http://127.0.0.1:8080/api/kv/demo
+```
+
+Delete a value:
+
+```bash
+curl -X DELETE http://127.0.0.1:8080/api/kv/demo
+```
+
+The status dashboard also performs a KV write/read test from the browser.
+
+## Background jobs
+
+Pico uses the Vix ThreadPool through `PicoThreadPool`.
+
+Run a diagnostic job:
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/jobs \
+  -H "Content-Type: application/json" \
+  -d '{"name":"demo-job","value":21}'
+```
+
+Run a slow timeout-observation job:
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/jobs/slow
+```
+
+ThreadPool metrics are available through:
+
+```txt
+GET /api/threadpool
+```
+
+The metrics include values such as:
+
+```txt
+workers
+pending
+active
+idle_workers
+busy_workers
+submitted
+completed
+failed
+cancelled
+timed_out
+rejected
+```
+
+## WebSocket
+
+Pico can run HTTP and WebSocket together through Vix AttachedRuntime.
+
+When WebSocket is enabled, Pico exposes a WebSocket runtime on the configured WebSocket port.
+
+The status dashboard can test WebSocket behavior by sending a typed `ping` message and expecting a `pong` response.
+
+Diagnostic routes:
+
+```txt
+GET /api/ws/info
+GET /api/ws/metrics
+```
+
+Supported WebSocket behavior includes:
+
+- client open events
+- raw echo messages
+- typed `ping` / `pong`
+- room join
+- room broadcast
+- close events
+- error events
 
 ## Routes
 
@@ -352,26 +593,26 @@ src/pico/presentation/routes/RouteRegistry.cpp
 Current routes:
 
 ```txt
-GET  /api
-GET  /health
-GET  /api/health
+GET    /api
+GET    /health
+GET    /api/health
 
-GET  /api/status
-GET  /api/threadpool
+GET    /api/status
+GET    /api/threadpool
 
-POST /api/kv
-GET  /api/kv/:key
-DEL  /api/kv/:key
+POST   /api/kv
+GET    /api/kv/:key
+DELETE /api/kv/:key
 
-GET  /api/events
-POST /api/events
-GET  /api/events.csv
+GET    /api/events
+POST   /api/events
+GET    /api/events.csv
 
-POST /api/jobs
-POST /api/jobs/slow
+POST   /api/jobs
+POST   /api/jobs/slow
 
-GET  /api/ws/info
-GET  /api/ws/metrics
+GET    /api/ws/info
+GET    /api/ws/metrics
 ```
 
 The `/` route is served from:
@@ -416,121 +657,26 @@ CORS
   -> routes
 ```
 
-## SQLite events
+## Static files
 
-Pico stores runtime events in SQLite.
-
-The event model contains:
+Static files live in:
 
 ```txt
-id
-source
-type
-payload
-created_at
+public/
 ```
 
-Common event types:
+The app mounts `public/` at `/`.
+
+Current public files:
 
 ```txt
-system / app.boot
-kv     / kv.write
-kv     / kv.delete
-job    / job.completed
-job    / job.slow.completed
-ws     / ws.open
-ws     / ws.ping
-ws     / ws.message
-ws     / ws.close
-ws     / ws.error
+public/index.html
+public/status.html
+public/app.css
+public/app.js
 ```
 
-The latest events are available through:
-
-```txt
-GET /api/events
-```
-
-CSV export is available through:
-
-```txt
-GET /api/events.csv
-```
-
-The CSV export uses Rix.
-
-## Durable KV
-
-Pico uses Vix KV to persist small runtime values.
-
-Write a value:
-
-```bash
-curl -X POST http://127.0.0.1:8080/api/kv \
-  -H "Content-Type: application/json" \
-  -d '{"key":"demo","value":"hello"}'
-```
-
-Read a value:
-
-```bash
-curl http://127.0.0.1:8080/api/kv/demo
-```
-
-Delete a value:
-
-```bash
-curl -X DELETE http://127.0.0.1:8080/api/kv/demo
-```
-
-## Background jobs
-
-Pico uses the Vix ThreadPool through `PicoThreadPool`.
-
-Run a diagnostic job:
-
-```bash
-curl -X POST http://127.0.0.1:8080/api/jobs \
-  -H "Content-Type: application/json" \
-  -d '{"name":"demo-job","value":21}'
-```
-
-Run a slow timeout-observation job:
-
-```bash
-curl -X POST http://127.0.0.1:8080/api/jobs/slow
-```
-
-ThreadPool metrics are available through:
-
-```txt
-GET /api/threadpool
-```
-
-## WebSocket
-
-Pico can run HTTP and WebSocket together through Vix AttachedRuntime.
-
-When WebSocket is enabled, Pico exposes a WebSocket runtime on the configured WebSocket port.
-
-The status dashboard can test WebSocket behavior by sending a typed `ping` message and expecting a `pong` response.
-
-Diagnostic routes:
-
-```txt
-GET /api/ws/info
-GET /api/ws/metrics
-```
-
-Supported WebSocket behavior includes:
-
-- client open events
-- raw echo messages
-- typed `ping` / `pong`
-- room join
-- room broadcast
-- close events
-- error events
+The frontend is intentionally framework-free. It uses plain HTML, CSS, and JavaScript to inspect the runtime through the HTTP and WebSocket APIs.
 
 ## Configuration
 
@@ -598,21 +744,6 @@ Vix generates an internal build project under:
 
 Do not edit generated files manually. Edit `vix.app` and source files instead.
 
-## Common commands
-
-```bash
-vix dev
-vix build
-vix run
-vix tests
-```
-
-For a stronger local validation:
-
-```bash
-vix check --tests --run
-```
-
 ## Migrations
 
 Pico includes a `migrations/` directory.
@@ -634,25 +765,6 @@ vix orm rollback --steps 1
 
 Pico also ensures the events table exists at startup through `EventRepository::ensure_schema()`.
 
-## Static files
-
-Static files live in:
-
-```txt
-public/
-```
-
-The app mounts `public/` at `/`.
-
-Current public files:
-
-```txt
-public/index.html
-public/status.html
-public/app.css
-public/app.js
-```
-
 ## Templates
 
 Templates can be placed in:
@@ -667,17 +779,137 @@ The app configures the template directory through:
 app.templates(views_path);
 ```
 
-## Notes for development
+## Common commands
 
-Keep the structure simple:
+```bash
+vix dev
+vix build
+vix run
+vix tests
+```
+
+For stronger local validation:
+
+```bash
+vix check --tests --run
+```
+
+## Manual checks
+
+Health:
+
+```bash
+curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:8080/api/health
+```
+
+Runtime status:
+
+```bash
+curl http://127.0.0.1:8080/api/status
+```
+
+ThreadPool metrics:
+
+```bash
+curl http://127.0.0.1:8080/api/threadpool
+```
+
+Events:
+
+```bash
+curl http://127.0.0.1:8080/api/events
+```
+
+CSV export:
+
+```bash
+curl -L http://127.0.0.1:8080/api/events.csv -o pico-events.csv
+```
+
+KV write/read:
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/kv \
+  -H "Content-Type: application/json" \
+  -d '{"key":"demo","value":"hello"}'
+
+curl http://127.0.0.1:8080/api/kv/demo
+```
+
+Job execution:
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/jobs \
+  -H "Content-Type: application/json" \
+  -d '{"name":"demo-job","value":21}'
+```
+
+WebSocket diagnostics:
+
+```bash
+curl http://127.0.0.1:8080/api/ws/info
+curl http://127.0.0.1:8080/api/ws/metrics
+```
+
+## Design constraints
+
+Pico should remain small, but real.
+
+It should not become a large framework example or a business application. Its purpose is to keep validating Vix.cpp runtime behavior under realistic conditions.
+
+Keep these rules:
 
 - keep `main.cpp` minimal
 - keep startup wiring in `AppBootstrap`
 - register routes through `RouteRegistry`
 - register middleware through `MiddlewareRegistry`
 - keep HTTP logic inside controllers
-- keep runtime logic inside services
-- keep database, KV, ThreadPool, and WebSocket wrappers under `infrastructure`
+- keep runtime coordination inside services
+- keep database, KV, filesystem, time, ThreadPool, and WebSocket wrappers under `infrastructure`
 - keep reusable JSON and HTTP helpers under `support`
+- use Vix modules where they exist
+- use Rix for optional userland libraries
+- do not mix Rix into the Vix core runtime identity
 
-Pico should remain small, but real enough to validate Vix.cpp under realistic backend conditions.
+## How to read Pico
+
+For reviewers and contributors, the most important files are:
+
+```txt
+src/main.cpp
+src/pico/app/AppBootstrap.cpp
+src/pico/presentation/routes/RouteRegistry.cpp
+src/pico/presentation/middleware/MiddlewareRegistry.cpp
+src/pico/application/services/RuntimeStatusService.cpp
+src/pico/infrastructure/kv/PicoKvStore.cpp
+src/pico/infrastructure/database/EventRepository.cpp
+src/pico/infrastructure/websocket/PicoWebSocketServer.cpp
+public/status.html
+public/app.js
+```
+
+These files show the core runtime flow from process startup to browser-visible diagnostics.
+
+## Summary
+
+Pico is the Vix.cpp runtime validation app.
+
+It proves that a native C++ backend can be structured, observed, and exercised through Vix.cpp while remaining explicit and understandable.
+
+It validates the runtime in a real application shape:
+
+```txt
+C++ source
+  -> Vix.cpp runtime
+  -> HTTP app
+  -> middleware
+  -> services
+  -> KV + SQLite
+  -> ThreadPool
+  -> WebSocket
+  -> runtime dashboard
+  -> Rix CSV export
+```
+
+Pico should stay focused: small enough to understand, real enough to catch integration problems.

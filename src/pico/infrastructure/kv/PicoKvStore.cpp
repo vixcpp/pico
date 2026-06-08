@@ -20,6 +20,9 @@
 #include <stdexcept>
 #include <utility>
 
+#include <vix/fs/Fs.hpp>
+#include <vix/time/time.hpp>
+
 namespace pico::infrastructure::kv
 {
   namespace
@@ -44,6 +47,41 @@ namespace pico::infrastructure::kv
         return 0;
       }
     }
+
+    [[nodiscard]] std::string corrupted_backup_path(const std::string &path)
+    {
+      const auto now = vix::time::SystemClock::now();
+
+      return path + ".corrupted." +
+             std::to_string(now.nanoseconds_since_epoch());
+    }
+
+    void move_corrupted_store_or_throw(const std::string &path)
+    {
+      const auto found = vix::fs::exists(path);
+
+      if (found.has_error())
+      {
+        throw std::runtime_error{
+            std::string{"failed to inspect Pico KV store path: "} +
+            std::string{found.error().message()}};
+      }
+
+      if (!found.value())
+      {
+        return;
+      }
+
+      const auto backup_path = corrupted_backup_path(path);
+      const auto moved = vix::fs::move(path, backup_path);
+
+      if (moved.has_error())
+      {
+        throw std::runtime_error{
+            std::string{"failed to move corrupted Pico KV store to backup: "} +
+            std::string{moved.error().message()}};
+      }
+    }
   }
 
   PicoKvStore::PicoKvStore()
@@ -64,7 +102,16 @@ namespace pico::infrastructure::kv
       return;
     }
 
-    store_.emplace(vix::kv::open(path_));
+    try
+    {
+      store_.emplace(vix::kv::open(path_));
+    }
+    catch (const std::exception &)
+    {
+      move_corrupted_store_or_throw(path_);
+
+      store_.emplace(vix::kv::open(path_));
+    }
   }
 
   void PicoKvStore::close()

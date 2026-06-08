@@ -8,7 +8,7 @@
 
     <meta
       name="description"
-      content="Pico is a small production-style Vix.cpp backend used to test HTTP routes, static files, KV storage, SQLite events, background jobs, and WebSocket runtime behavior."
+      content="Pico is a small native C++ runtime app built with Vix.cpp to validate HTTP routes, durable state, SQLite events, background jobs, and WebSocket diagnostics."
     />
 
     <link rel="stylesheet" href="/app.css" />
@@ -18,12 +18,66 @@
     <header class="pico-header">
       <nav class="pico-nav" aria-label="Main navigation">
         <a class="pico-brand" href="/">
-          <span class="pico-brand-mark">P</span>
+          <span class="pico-brand-mark" aria-hidden="true">
+            <svg
+              viewBox="0 0 36 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient
+                  id="pico-logo-left"
+                  x1="5"
+                  y1="6"
+                  x2="18"
+                  y2="30"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stop-color="#d4fcd4" />
+                  <stop offset="55%" stop-color="#4ade80" />
+                  <stop offset="100%" stop-color="#22c55e" />
+                </linearGradient>
+
+                <linearGradient
+                  id="pico-logo-right"
+                  x1="31"
+                  y1="6"
+                  x2="18"
+                  y2="30"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stop-color="#22c55e" />
+                  <stop offset="100%" stop-color="#15803d" />
+                </linearGradient>
+              </defs>
+
+              <polygon
+                points="5,6 12,6 18,28 14,28"
+                fill="url(#pico-logo-left)"
+              />
+              <polygon
+                points="31,6 24,6 18,28 22,28"
+                fill="url(#pico-logo-right)"
+              />
+
+              <line
+                x1="9"
+                y1="16"
+                x2="13.5"
+                y2="29"
+                stroke="#bbf7d0"
+                stroke-width="1.1"
+                stroke-linecap="round"
+                opacity="0.7"
+              />
+            </svg>
+          </span>
+
           <span class="pico-brand-text">Pico</span>
         </a>
 
         <div class="pico-nav-links">
-          <a href="/">Home</a>
+          <a href="/" aria-current="page">Home</a>
           <a href="/status.html">Status</a>
           <a href="/api/health">API Health</a>
           <a href="/api/status">Runtime JSON</a>
@@ -32,26 +86,25 @@
     </header>
 
     <main class="pico-main">
-      <section class="pico-hero">
+      <section class="pico-hero pico-hero-compact">
         <div class="pico-hero-content">
-          <p class="pico-eyebrow">Vix.cpp production test app</p>
+          <p class="pico-eyebrow">Vix.cpp runtime app</p>
 
-          <h1>Small app. Real runtime.</h1>
+          <h1>Native C++. Real backend runtime.</h1>
 
           <p class="pico-hero-text">
-            Pico is a compact backend application built with Vix.cpp. It is used
-            to test real application features such as HTTP routing, static
-            files, middleware, SQLite events, durable KV state, background jobs,
-            and WebSocket diagnostics.
+            Pico is a compact C++ backend built with Vix.cpp. It validates real
+            runtime features in one running app: HTTP routes, durable KV state,
+            SQLite events, background jobs, and WebSocket diagnostics.
           </p>
 
           <div class="pico-actions">
             <a class="pico-button pico-button-primary" href="/status.html">
-              Open status page
+              Inspect live runtime
             </a>
 
             <a class="pico-button pico-button-secondary" href="/api/status">
-              View API status
+              View runtime JSON
             </a>
           </div>
         </div>
@@ -59,23 +112,28 @@
         <aside class="pico-card pico-runtime-card" aria-label="Runtime summary">
           <div class="pico-card-header">
             <span class="pico-status-dot"></span>
-            <span>Runtime</span>
+            <span>Runtime summary</span>
           </div>
 
           <dl class="pico-runtime-list">
             <div>
-              <dt>Framework</dt>
+              <dt>Language</dt>
+              <dd>C++</dd>
+            </div>
+
+            <div>
+              <dt>Runtime</dt>
               <dd>Vix.cpp</dd>
             </div>
 
             <div>
               <dt>HTTP</dt>
-              <dd>Port 8080</dd>
+              <dd>Enabled</dd>
             </div>
 
             <div>
-              <dt>WebSocket</dt>
-              <dd>Port 9090</dd>
+              <dt>Realtime</dt>
+              <dd>WebSocket</dd>
             </div>
 
             <div>
@@ -86,78 +144,63 @@
         </aside>
       </section>
 
-      <section class="pico-section" aria-labelledby="features-title">
+      <section
+        class="pico-section pico-section-compact"
+        aria-labelledby="proof-title"
+      >
         <div class="pico-section-heading">
-          <p class="pico-eyebrow">What Pico checks</p>
-          <h2 id="features-title">Runtime features connected in one app</h2>
+          <p class="pico-eyebrow">What it proves</p>
+          <h2 id="proof-title">One small app. Multiple runtime layers.</h2>
         </div>
 
-        <div class="pico-grid">
+        <div class="pico-grid pico-grid-compact">
           <article class="pico-card">
-            <h3>HTTP routes</h3>
+            <h3>HTTP runtime</h3>
             <p>
-              Pico exposes health, status, KV, event, job, and WebSocket
-              diagnostic routes through the Vix application router.
+              Routes, middleware, static files, health checks, and JSON APIs run
+              through the Vix application layer.
             </p>
           </article>
 
           <article class="pico-card">
-            <h3>Static files</h3>
+            <h3>Durable state</h3>
             <p>
-              This page is served from the public directory through the Vix
-              static file system.
+              Runtime counters and KV values survive through persistent storage
+              so restart behavior can be observed.
             </p>
           </article>
 
           <article class="pico-card">
-            <h3>Durable KV</h3>
+            <h3>Live diagnostics</h3>
             <p>
-              Runtime counters such as boot count, HTTP requests, WebSocket
-              messages, and job runs are persisted through Vix KV.
-            </p>
-          </article>
-
-          <article class="pico-card">
-            <h3>SQLite events</h3>
-            <p>
-              Runtime events are stored in SQLite so Pico can observe what
-              happened during requests, jobs, and WebSocket activity.
-            </p>
-          </article>
-
-          <article class="pico-card">
-            <h3>ThreadPool jobs</h3>
-            <p>
-              Pico submits diagnostic work to the Vix ThreadPool and exposes
-              worker metrics through the status API.
-            </p>
-          </article>
-
-          <article class="pico-card">
-            <h3>WebSocket runtime</h3>
-            <p>
-              Pico prepares a WebSocket server and lets Vix AttachedRuntime run
-              HTTP and WebSocket together under one lifecycle.
+              The status dashboard exposes metrics, events, ThreadPool jobs, and
+              WebSocket checks from the browser.
             </p>
           </article>
         </div>
       </section>
 
-      <section class="pico-section" aria-labelledby="api-title">
-        <div class="pico-section-heading">
-          <p class="pico-eyebrow">Quick links</p>
-          <h2 id="api-title">Useful endpoints</h2>
+      <section
+        class="pico-section pico-section-compact"
+        aria-labelledby="api-title"
+      >
+        <div class="pico-section-heading pico-section-heading-row">
+          <div>
+            <p class="pico-eyebrow">Runtime inspection</p>
+            <h2 id="api-title">Useful endpoints</h2>
+          </div>
+
+          <a class="pico-button pico-button-secondary" href="/status.html">
+            Open dashboard
+          </a>
         </div>
 
         <div class="pico-endpoints">
-          <a href="/api">GET /api</a>
-          <a href="/health">GET /health</a>
           <a href="/api/health">GET /api/health</a>
           <a href="/api/status">GET /api/status</a>
           <a href="/api/threadpool">GET /api/threadpool</a>
           <a href="/api/events">GET /api/events</a>
           <a href="/api/events.csv">GET /api/events.csv</a>
-          <a href="/api/ws/info">GET /api/ws/info</a>
           <a href="/api/ws/metrics">GET /api/ws/metrics</a>
         </div>
       </section>

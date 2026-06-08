@@ -5,6 +5,14 @@
 
   const pretty = (value) => JSON.stringify(value, null, 2);
 
+  const eventsState = {
+    limit: 20,
+    offset: 0,
+    loading: false,
+    done: false,
+    total: null,
+  };
+
   const setText = (selector, value) => {
     const element = $(selector);
 
@@ -81,13 +89,181 @@
       .replaceAll("'", "&#039;");
   };
 
+  const formatPayload = (payload) => {
+    if (payload === null || payload === undefined || payload === "") {
+      return "—";
+    }
+
+    if (typeof payload === "string") {
+      return payload;
+    }
+
+    try {
+      return JSON.stringify(payload);
+    } catch {
+      return String(payload);
+    }
+  };
+
+  const normalizeEvents = (payload) => {
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+
+    if (Array.isArray(payload?.events)) {
+      return payload.events;
+    }
+
+    if (Array.isArray(payload?.data)) {
+      return payload.data;
+    }
+
+    return [];
+  };
+
+  const getEventsTotal = (payload) => {
+    return payload?.total ?? payload?.count ?? payload?.events_count ?? null;
+  };
+
+  const updateEventsFooter = () => {
+    const button = $("#load-more-events");
+    const count = $("#events-count");
+
+    if (count) {
+      if (eventsState.total !== null) {
+        count.textContent = `Showing ${eventsState.offset} of ${eventsState.total} runtime events`;
+      } else {
+        count.textContent = `Showing ${eventsState.offset} runtime event${
+          eventsState.offset > 1 ? "s" : ""
+        }`;
+      }
+    }
+
+    if (button) {
+      button.disabled = eventsState.loading || eventsState.done;
+      button.textContent = eventsState.loading
+        ? "Loading…"
+        : eventsState.done
+          ? "No more events"
+          : "Load more events";
+    }
+  };
+
+  const renderEventRows = (events, { append = false } = {}) => {
+    const body = $("#events-table-body");
+
+    if (!body) {
+      return;
+    }
+
+    if (!append) {
+      body.innerHTML = "";
+    }
+
+    if (!Array.isArray(events) || events.length === 0) {
+      if (!append) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="5">No events yet.</td>
+          </tr>
+        `;
+      }
+
+      return;
+    }
+
+    const html = events
+      .map((event) => {
+        return `
+          <tr>
+            <td>${escapeHtml(event.id ?? "—")}</td>
+            <td>${escapeHtml(event.source ?? "—")}</td>
+            <td>${escapeHtml(event.type ?? "—")}</td>
+            <td>${escapeHtml(formatPayload(event.payload))}</td>
+            <td>${escapeHtml(event.created_at ?? event.created ?? "—")}</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    body.insertAdjacentHTML("beforeend", html);
+  };
+
+  const loadEvents = async ({ reset = false } = {}) => {
+    const body = $("#events-table-body");
+
+    if (!body || eventsState.loading) {
+      return;
+    }
+
+    if (reset) {
+      eventsState.offset = 0;
+      eventsState.done = false;
+      eventsState.total = null;
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="5">Loading events…</td>
+        </tr>
+      `;
+    }
+
+    if (eventsState.done) {
+      updateEventsFooter();
+      return;
+    }
+
+    eventsState.loading = true;
+    updateEventsFooter();
+
+    try {
+      const payload = await fetchJson(
+        `/api/events?limit=${eventsState.limit}&offset=${eventsState.offset}`,
+      );
+
+      const events = normalizeEvents(payload);
+      const total = getEventsTotal(payload);
+
+      if (total !== null) {
+        eventsState.total = Number(total);
+      }
+
+      renderEventRows(events, {
+        append: !reset,
+      });
+
+      eventsState.offset += events.length;
+
+      if (events.length < eventsState.limit) {
+        eventsState.done = true;
+      }
+
+      if (
+        eventsState.total !== null &&
+        eventsState.offset >= eventsState.total
+      ) {
+        eventsState.done = true;
+      }
+    } catch (error) {
+      body.innerHTML = `
+        <tr>
+          <td colspan="5">Failed to load events: ${escapeHtml(error.message)}</td>
+        </tr>
+      `;
+
+      eventsState.done = true;
+    } finally {
+      eventsState.loading = false;
+      updateEventsFooter();
+    }
+  };
+
   const loadStatus = async () => {
     try {
-      const [health, status, threadpool, events] = await Promise.all([
+      const [health, status, threadpool] = await Promise.all([
         fetchJson("/api/health"),
         fetchJson("/api/status"),
         fetchJson("/api/threadpool"),
-        fetchJson("/api/events"),
       ]);
 
       setText("#metric-health", health?.status || "ok");
@@ -98,10 +274,7 @@
 
       setText("#metric-uptime", String(status?.uptime_seconds ?? "—"));
       setText("#metric-boot-count", String(status?.boot_count ?? "—"));
-      setText(
-        "#metric-events",
-        String(status?.events?.total ?? events?.count ?? "—"),
-      );
+      setText("#metric-events", String(status?.events?.total ?? "—"));
       setText("#metric-http", String(status?.http_requests ?? "—"));
       setText("#metric-ws", String(status?.ws_messages ?? "—"));
 
@@ -125,44 +298,20 @@
         "#threadpool-failed",
         String(stats?.failed ?? metrics?.failed ?? "—"),
       );
-
-      renderEvents(events?.events || []);
     } catch (error) {
       setText("#metric-health", "Error");
       setText("#metric-health-note", error.message);
-      setOutput("#events-table-body", error.message);
-    }
-  };
 
-  const renderEvents = (events) => {
-    const body = $("#events-table-body");
+      const body = $("#events-table-body");
 
-    if (!body) {
-      return;
-    }
-
-    if (!Array.isArray(events) || events.length === 0) {
-      body.innerHTML = `
-        <tr>
-          <td colspan="5">No events yet.</td>
-        </tr>
-      `;
-      return;
-    }
-
-    body.innerHTML = events
-      .map((event) => {
-        return `
+      if (body) {
+        body.innerHTML = `
           <tr>
-            <td>${escapeHtml(event.id ?? "")}</td>
-            <td>${escapeHtml(event.source ?? "")}</td>
-            <td>${escapeHtml(event.type ?? "")}</td>
-            <td>${escapeHtml(event.payload ?? "")}</td>
-            <td>${escapeHtml(event.created_at ?? "")}</td>
+            <td colspan="5">Status load failed: ${escapeHtml(error.message)}</td>
           </tr>
         `;
-      })
-      .join("");
+      }
+    }
   };
 
   const setupRefreshButton = () => {
@@ -177,9 +326,22 @@
       button.textContent = "Refreshing…";
 
       await loadStatus();
+      await loadEvents({ reset: true });
 
       button.disabled = false;
       button.textContent = "Refresh";
+    });
+  };
+
+  const setupEventsPagination = () => {
+    const button = $("#load-more-events");
+
+    if (!button) {
+      return;
+    }
+
+    button.addEventListener("click", async () => {
+      await loadEvents();
     });
   };
 
@@ -219,6 +381,7 @@
         });
 
         await loadStatus();
+        await loadEvents({ reset: true });
       } catch (error) {
         setOutput("#kv-output", {
           ok: false,
@@ -252,6 +415,7 @@
         setOutput("#job-output", result);
 
         await loadStatus();
+        await loadEvents({ reset: true });
       } catch (error) {
         setOutput("#job-output", {
           ok: false,
@@ -283,6 +447,7 @@
         });
 
         await loadStatus();
+        await loadEvents({ reset: true });
       } catch (error) {
         setOutput("#ws-output", {
           ok: false,
@@ -343,6 +508,7 @@
 
         try {
           await loadStatus();
+          await loadEvents({ reset: true });
         } catch {
           // The WebSocket test should not fail only because status refresh failed.
         }
@@ -365,13 +531,18 @@
 
   const init = async () => {
     setupRefreshButton();
+    setupEventsPagination();
     setupKvForm();
     setupJobForm();
     setupWebSocketInfoButton();
     setupWebSocketTestButton();
 
-    if ($("#metric-health") || $("#events-table-body")) {
+    if ($("#metric-health")) {
       await loadStatus();
+    }
+
+    if ($("#events-table-body")) {
+      await loadEvents({ reset: true });
     }
   };
 
