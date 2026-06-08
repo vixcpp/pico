@@ -18,16 +18,16 @@ echo "==> Build Pico"
 "$VIX" build --build-target all -v
 
 echo "==> Restart service"
-"$VIX" service restart
+sudo -n systemctl restart pico.service
 
 echo "==> Check service"
-"$VIX" service status
+sudo -n systemctl status pico.service --no-pager
 
 echo "==> Health checks"
 "$VIX" health local
 "$VIX" health public
 
 echo "==> Production doctor"
-sudo "$VIX" doctor production
+sudo -n "$VIX" doctor production
 
 echo "==> Pico deployed successfully"
