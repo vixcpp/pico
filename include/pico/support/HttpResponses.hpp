@@ -1,10 +1,21 @@
 /**
- * @file HttpResponses.hpp
- * @brief JSON response helpers for the pico backend.
+ *
+ *  @file HttpResponses.hpp
+ *  @author Gaspard Kirira
+ *
+ *  Copyright 2026, Gaspard Kirira.
+ *  All rights reserved.
+ *  https://github.com/vixcpp/pico
+ *
+ *  Use of this source code is governed by a MIT license
+ *  that can be found in the License file.
+ *
+ *  Pico
+ *
  */
 
-#ifndef VIX_GENERATED_BACKEND_PICO_HTTP_RESPONSES_HPP
-#define VIX_GENERATED_BACKEND_PICO_HTTP_RESPONSES_HPP
+#ifndef PICO_SUPPORT_HTTP_RESPONSES_HPP
+#define PICO_SUPPORT_HTTP_RESPONSES_HPP
 
 #include <string>
 
@@ -45,6 +56,6 @@ namespace pico::support
   void json_message(
       vix::Response &res,
       const std::string &message);
-} // namespace pico::support
+}
 
-#endif // VIX_GENERATED_BACKEND_PICO_HTTP_RESPONSES_HPP
+#endif // PICO_SUPPORT_HTTP_RESPONSES_HPP

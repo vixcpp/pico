@@ -1,46 +1,57 @@
 /**
- * @file AppBootstrap.hpp
- * @brief Application bootstrap for the pico backend.
+ *
+ *  @file AppBootstrap.hpp
+ *  @author Gaspard Kirira
+ *
+ *  Copyright 2026, Gaspard Kirira.
+ *  All rights reserved.
+ *  https://github.com/vixcpp/pico
+ *
+ *  Use of this source code is governed by a MIT license
+ *  that can be found in the License file.
+ *
+ *  Pico
+ *
  */
 
-#ifndef VIX_GENERATED_BACKEND_PICO_APP_BOOTSTRAP_HPP
-#define VIX_GENERATED_BACKEND_PICO_APP_BOOTSTRAP_HPP
+#ifndef PICO_APP_APP_BOOTSTRAP_HPP
+#define PICO_APP_APP_BOOTSTRAP_HPP
 
 namespace pico::app
 {
   /**
-   * @brief Owns the startup sequence of the backend application.
+   * @brief Owns the startup sequence of the Pico backend application.
    *
-   * AppBootstrap keeps main.cpp minimal and centralizes the application
-   * initialization flow: configuration loading, Vix app creation,
-   * template/static directory setup, middleware registration, route
-   * registration, and server startup.
+   * AppBootstrap keeps main.cpp minimal and centralizes configuration loading,
+   * Vix app creation, infrastructure initialization, middleware registration,
+   * route registration, static files, templates, and server startup.
    */
   class AppBootstrap
   {
   public:
     /**
-     * @brief Create a default application bootstrap instance.
+     * @brief Creates a default application bootstrap instance.
      */
     AppBootstrap() = default;
 
     /**
-     * @brief Destroy the application bootstrap instance.
+     * @brief Destroys the application bootstrap instance.
      */
     ~AppBootstrap() = default;
 
     AppBootstrap(const AppBootstrap &) = delete;
     AppBootstrap &operator=(const AppBootstrap &) = delete;
-    AppBootstrap(AppBootstrap &&) = delete;
-    AppBootstrap &operator=(AppBootstrap &&) = delete;
+
+    AppBootstrap(AppBootstrap &&) noexcept = delete;
+    AppBootstrap &operator=(AppBootstrap &&) noexcept = delete;
 
     /**
-     * @brief Run the backend application.
+     * @brief Runs the Pico backend application.
      *
-     * @return Process exit code. Returns 0 when the application exits normally.
+     * @return Process exit code.
      */
     int run();
   };
-} // namespace pico::app
+}
 
-#endif // VIX_GENERATED_BACKEND_PICO_APP_BOOTSTRAP_HPP
+#endif // PICO_APP_APP_BOOTSTRAP_HPP

@@ -1,10 +1,21 @@
 /**
- * @file MiddlewareRegistry.hpp
- * @brief Middleware registry for the pico backend.
+ *
+ *  @file MiddlewareRegistry.hpp
+ *  @author Gaspard Kirira
+ *
+ *  Copyright 2026, Gaspard Kirira.
+ *  All rights reserved.
+ *  https://github.com/vixcpp/pico
+ *
+ *  Use of this source code is governed by a MIT license
+ *  that can be found in the License file.
+ *
+ *  Pico
+ *
  */
 
-#ifndef VIX_GENERATED_BACKEND_PICO_MIDDLEWARE_REGISTRY_HPP
-#define VIX_GENERATED_BACKEND_PICO_MIDDLEWARE_REGISTRY_HPP
+#ifndef PICO_PRESENTATION_MIDDLEWARE_MIDDLEWARE_REGISTRY_HPP
+#define PICO_PRESENTATION_MIDDLEWARE_MIDDLEWARE_REGISTRY_HPP
 
 namespace vix
 {
@@ -14,21 +25,21 @@ namespace vix
 namespace pico::presentation::middleware
 {
   /**
-   * @brief Central registry for application middleware.
+   * @brief Central registry for Pico middleware.
    *
-   * MiddlewareRegistry keeps the middleware stack in one place so the
-   * application bootstrap can stay small and focused on startup flow.
+   * MiddlewareRegistry keeps HTTP middleware in one place so the application
+   * bootstrap can stay focused on startup, infrastructure, and service wiring.
    */
   class MiddlewareRegistry
   {
   public:
     /**
-     * @brief Register all middleware on the given Vix application.
+     * @brief Registers all middleware on the given Vix application.
      *
-     * @param app Target application receiving the middleware stack.
+     * @param app Target Vix application.
      */
     static void register_all(vix::App &app);
   };
-} // namespace pico::presentation::middleware
+}
 
-#endif // VIX_GENERATED_BACKEND_PICO_MIDDLEWARE_REGISTRY_HPP
+#endif // PICO_PRESENTATION_MIDDLEWARE_MIDDLEWARE_REGISTRY_HPP
