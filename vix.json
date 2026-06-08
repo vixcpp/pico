@@ -22,20 +22,56 @@
       "migrations": "migrations",
       "sqlite_path": "storage/pico.db"
     },
-    "deploy": {
-      "branch": "main",
-      "build": "vix build",
-      "health_local": true,
-      "health_public": false,
-      "log_lines": 80,
-      "logs_on_failure": true,
-      "proxy_check": true,
-      "proxy_reload": false,
-      "pull": true,
-      "rollback": false,
+    "ports": {
+      "http": 8080,
+      "websocket": 9090
+    },
+    "service": {
+      "name": "pico",
+      "user": "gaspard",
+      "working_dir": "/home/gaspard/vixcpp/pico",
+      "exec": "build-ninja/bin/pico",
+      "restart": "always",
+      "restart_sec": 3,
+      "limit_nofile": 65535
+    },
+    "proxy": {
+      "domain": "pico.vixcpp.com",
+      "http": {
+        "port": 8080
+      },
+      "websocket": {
+        "enabled": true,
+        "path": "/ws",
+        "port": 9090
+      },
+      "tls": {
+        "enabled": true
+      }
+    },
+    "websocket": {
+      "host": "127.0.0.1",
+      "port": 9090,
+      "path": "/ws",
+      "local_url": "ws://127.0.0.1:9090/ws",
+      "public_url": "wss://pico.vixcpp.com/ws",
+      "timeout_ms": 5000,
+      "heartbeat": true
+    },
+    "health": {
       "service": "pico",
-      "test_command": "vix tests",
-      "tests": false
+      "local": "http://127.0.0.1:8080/health",
+      "public": "https://pico.vixcpp.com/health",
+      "websocket": "wss://pico.vixcpp.com/ws",
+      "expected_status": 200,
+      "timeout_ms": 2000,
+      "max_response_ms": 3000
+    },
+    "logs": {
+      "service": "pico",
+      "nginx_access": "/var/log/nginx/pico.access.log",
+      "nginx_error": "/var/log/nginx/pico.error.log",
+      "lines": 120
     },
     "env": {
       "required": [
@@ -53,50 +89,20 @@
         "DATABASE_SQLITE_PATH"
       ]
     },
-    "health": {
-      "expected_status": 200,
-      "local": "http://127.0.0.1:8080/health",
-      "max_response_ms": 1000,
-      "public": "",
+    "deploy": {
+      "pull": true,
+      "branch": "main",
+      "build": "vix build",
+      "tests": false,
+      "test_command": "vix tests",
       "service": "pico",
-      "timeout_ms": 2000,
-      "websocket": ""
-    },
-    "logs": {
-      "lines": 120,
-      "nginx_access": "/var/log/nginx/pico.access.log",
-      "nginx_error": "/var/log/nginx/pico.error.log",
-      "service": "pico"
-    },
-    "ports": {
-      "http": 8080,
-      "websocket": 9090
-    },
-    "proxy": {
-      "certificate": "",
-      "certificate_key": "",
-      "domain": "",
-      "tls": false,
-      "type": "nginx",
-      "websocket_path": "/ws"
-    },
-    "service": {
-      "exec": "bin/pico",
-      "limit_nofile": 65535,
-      "name": "pico",
-      "restart": "always",
-      "restart_sec": 3,
-      "user": "",
-      "working_dir": "."
-    },
-    "websocket": {
-      "heartbeat": true,
-      "host": "127.0.0.1",
-      "local_url": "ws://127.0.0.1:9090/ws",
-      "path": "/ws",
-      "port": 9090,
-      "public_url": "",
-      "timeout_ms": 5000
+      "health_local": true,
+      "health_public": true,
+      "proxy_check": true,
+      "proxy_reload": true,
+      "logs_on_failure": true,
+      "log_lines": 120,
+      "rollback": false
     }
   },
   "tasks": {
