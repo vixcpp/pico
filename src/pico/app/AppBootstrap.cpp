@@ -30,6 +30,10 @@
 #include <cstddef>
 #include <exception>
 #include <string>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 #include <vix.hpp>
 #include <vix/log.hpp>
@@ -38,6 +42,7 @@
 #include <vix/middleware/performance/compression.hpp>
 #include <vix/middleware/performance/static_compression.hpp>
 #include <vix/websocket/AttachedRuntime.hpp>
+#include <vix/time/time.hpp>
 
 namespace pico::app
 {
@@ -65,6 +70,17 @@ namespace pico::app
         int fallback)
     {
       return cfg.getInt(key, fallback);
+    }
+
+    [[nodiscard]] std::string current_heartbeat_value()
+    {
+      const auto now = vix::time::SystemClock::now();
+
+      const auto seconds_timestamp =
+          vix::time::Timestamp::from_seconds(now.seconds_since_epoch());
+
+      return vix::time::DateTime::from_timestamp_utc(seconds_timestamp)
+          .to_string_utc();
     }
   }
 
@@ -168,6 +184,18 @@ namespace pico::app
           public_spa_fallback);
 
       presentation::middleware::MiddlewareRegistry::register_all(app);
+
+      app.use(
+          [&runtime_status](vix::Request &req, vix::Response &res, vix::App::Next next)
+          {
+            (void)req;
+            (void)res;
+
+            (void)runtime_status.increment_http_requests();
+            runtime_status.heartbeat(current_heartbeat_value());
+
+            next();
+          });
 
       presentation::routes::RouteRegistry::register_all(
           app,

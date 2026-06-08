@@ -49,7 +49,10 @@ namespace pico::application::services
   void RuntimeStatusService::heartbeat(const std::string &value)
   {
     kv_->set_last_heartbeat(value);
+  }
 
+  void RuntimeStatusService::record_heartbeat_event(const std::string &value)
+  {
     using namespace vix::json;
 
     const auto payload = o(

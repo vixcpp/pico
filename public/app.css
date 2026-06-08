@@ -330,7 +330,13 @@ strong {
 .pico-section-heading p {
   margin-bottom: 10px;
 }
-
+.pico-section-heading-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: none;
+}
 .pico-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -548,7 +554,10 @@ strong {
     padding: 14px 0;
     gap: 12px;
   }
-
+  .pico-section-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
   .pico-nav-links {
     justify-content: flex-start;
   }

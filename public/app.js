@@ -209,7 +209,9 @@
           value,
         });
 
-        const read = await fetchJson(`/api/kv/${encodeURIComponent(key)}`);
+        const read = await postJson("/api/kv/read", {
+          key,
+        });
 
         setOutput("#kv-output", {
           written,

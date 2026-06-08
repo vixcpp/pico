@@ -80,6 +80,50 @@ namespace pico::presentation::controllers
                        "value", value));
              });
 
+    app.post("/api/kv/read",
+             [&kv](vix::Request &req, vix::Response &res)
+             {
+               using namespace vix::json;
+
+               const auto body = try_loads(req.body());
+
+               if (!body.has_value())
+               {
+                 res.status(vix::http::BAD_REQUEST)
+                     .json(support::make_error_json(
+                         "invalid_json",
+                         "Invalid JSON body"));
+                 return;
+               }
+
+               const auto key = get_or<std::string>(*body, "key", "");
+
+               if (key.empty())
+               {
+                 res.status(vix::http::UNPROCESSABLE_ENTITY)
+                     .json(support::make_error_json(
+                         "missing_key",
+                         "Field 'key' is required"));
+                 return;
+               }
+
+               const auto value = kv.get(key);
+
+               if (!value.has_value())
+               {
+                 res.status(vix::http::NOT_FOUND)
+                     .json(support::make_error_json(
+                         "not_found",
+                         "KV key was not found"));
+                 return;
+               }
+
+               res.json(o(
+                   "ok", true,
+                   "key", key,
+                   "value", *value));
+             });
+
     app.get("/api/kv/:key",
             [&kv](vix::Request &req, vix::Response &res)
             {

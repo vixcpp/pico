@@ -75,6 +75,13 @@ namespace pico::application::services
     void heartbeat(const std::string &value);
 
     /**
+     * @brief Records a heartbeat event in SQLite without updating KV.
+     *
+     * @param value Heartbeat value.
+     */
+    void record_heartbeat_event(const std::string &value);
+
+    /**
      * @brief Increments the HTTP request counter.
      *
      * @return New HTTP request counter value.
