@@ -1,23 +1,98 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Basic -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pico · Vix.cpp Runtime App</title>
+    <title>Pico · Native C++ Runtime App powered by Vix.cpp</title>
 
+    <!-- Primary meta -->
     <meta
       name="description"
-      content="Pico is a small native C++ runtime app built with Vix.cpp to validate HTTP routes, durable state, SQLite events, background jobs, and WebSocket diagnostics."
+      content="Pico is a compact native C++ backend app powered by Vix.cpp. It demonstrates HTTP routes, durable KV state, SQLite events, background jobs, WebSocket diagnostics, and live runtime inspection."
     />
 
+    <meta name="author" content="Gaspard Kirira" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://pico.vixcpp.com/" />
+
+    <!-- Theme / Mobile -->
+    <meta name="theme-color" content="#101827" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Pico" />
+
+    <!-- Favicons / App icons -->
+    <link rel="icon" href="/assets/pwa/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/pwa/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/pwa/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/pwa/apple-touch-icon.png"
+    />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pico" />
+    <meta
+      property="og:title"
+      content="Pico · Native C++ Runtime App powered by Vix.cpp"
+    />
+    <meta
+      property="og:description"
+      content="Pico is a compact native C++ backend app powered by Vix.cpp. It demonstrates HTTP routes, durable KV state, SQLite events, background jobs, WebSocket diagnostics, and live runtime inspection."
+    />
+    <meta property="og:url" content="https://pico.vixcpp.com/" />
+    <meta
+      property="og:image"
+      content="https://pico.vixcpp.com/assets/logo/pico-og.png"
+    />
+    <meta property="og:image:alt" content="Pico powered by Vix.cpp" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Pico · Native C++ Runtime App powered by Vix.cpp"
+    />
+    <meta
+      name="twitter:description"
+      content="A compact native C++ backend app that validates real Vix.cpp runtime features: HTTP, durable state, SQLite events, jobs, WebSocket diagnostics, and live runtime inspection."
+    />
+    <meta
+      name="twitter:image"
+      content="https://pico.vixcpp.com/assets/logo/pico-og.png"
+    />
+    <meta name="twitter:site" content="@vix_cpp" />
+
+    <!-- Styles -->
     <link rel="stylesheet" href="/app.css" />
   </head>
 
   <body>
     <header class="pico-header">
       <nav class="pico-nav" aria-label="Main navigation">
-        <a class="pico-brand" href="/">
+        <a class="pico-brand" href="/" aria-label="Pico home">
           <span class="pico-brand-mark" aria-hidden="true">
             <svg
               viewBox="0 0 36 36"

@@ -1,23 +1,101 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Basic -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pico Status · Vix.cpp Runtime App</title>
+    <title>Pico Status · Live Vix.cpp Runtime Dashboard</title>
 
+    <!-- Primary meta -->
     <meta
       name="description"
-      content="Runtime dashboard for Pico, a Vix.cpp production-style test application."
+      content="Pico Status is a live runtime dashboard for a native C++ backend app powered by Vix.cpp. Inspect HTTP health, durable KV counters, SQLite events, ThreadPool metrics, WebSocket diagnostics, and runtime state from one page."
     />
 
+    <meta name="author" content="Gaspard Kirira" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://pico.vixcpp.com/status.html" />
+
+    <!-- Theme / Mobile -->
+    <meta name="theme-color" content="#101827" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Pico Status" />
+
+    <!-- Favicons / App icons -->
+    <link rel="icon" href="/assets/pwa/favicon.ico" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/pwa/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/pwa/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/pwa/apple-touch-icon.png"
+    />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pico" />
+    <meta
+      property="og:title"
+      content="Pico Status · Live Vix.cpp Runtime Dashboard"
+    />
+    <meta
+      property="og:description"
+      content="Inspect a real native C++ backend runtime powered by Vix.cpp: HTTP health, durable KV state, SQLite events, ThreadPool metrics, WebSocket diagnostics, and live runtime state."
+    />
+    <meta property="og:url" content="https://pico.vixcpp.com/status.html" />
+    <meta
+      property="og:image"
+      content="https://pico.vixcpp.com/assets/logo/pico-og.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="Pico Status live runtime dashboard powered by Vix.cpp"
+    />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Pico Status · Live Vix.cpp Runtime Dashboard"
+    />
+    <meta
+      name="twitter:description"
+      content="A live dashboard for a native C++ backend app powered by Vix.cpp. Inspect HTTP, KV state, SQLite events, ThreadPool metrics, and WebSocket diagnostics."
+    />
+    <meta
+      name="twitter:image"
+      content="https://pico.vixcpp.com/assets/logo/pico-og.png"
+    />
+    <meta name="twitter:site" content="@vix_cpp" />
+
+    <!-- Styles -->
     <link rel="stylesheet" href="/app.css" />
   </head>
 
   <body>
     <header class="pico-header">
       <nav class="pico-nav" aria-label="Main navigation">
-        <a class="pico-brand" href="/">
+        <a class="pico-brand" href="/" aria-label="Pico home">
           <span class="pico-brand-mark" aria-hidden="true">
             <svg
               viewBox="0 0 36 36"
@@ -93,8 +171,9 @@
           <div>
             <h1>Pico status</h1>
             <p>
-              Observe the HTTP runtime, durable KV counters, SQLite events,
-              ThreadPool metrics, and WebSocket diagnostics from one page.
+              Inspect the live state of a native C++ backend powered by Vix.cpp:
+              HTTP health, durable counters, SQLite events, ThreadPool metrics,
+              and WebSocket diagnostics.
             </p>
           </div>
 
@@ -113,9 +192,9 @@
         <div class="pico-metrics-grid">
           <article class="pico-metric-card">
             <span class="pico-metric-label">Health</span>
-            <strong class="pico-metric-value" id="metric-health"
-              >Loading</strong
-            >
+            <strong class="pico-metric-value" id="metric-health">
+              Loading
+            </strong>
             <span class="pico-metric-note" id="metric-health-note">
               Waiting for /api/health
             </span>
@@ -223,7 +302,7 @@
 
       <section
         class="pico-section pico-two-columns"
-        aria-label="Interactive checks"
+        aria-label="Interactive runtime checks"
       >
         <article class="pico-card">
           <div class="pico-card-header">
@@ -310,14 +389,15 @@
 
         <article class="pico-card">
           <p class="pico-muted">
-            Pico exposes WebSocket diagnostic endpoints and can connect to the
-            Vix WebSocket runtime when enabled.
+            Test the WebSocket runtime and inspect diagnostic information from
+            the browser.
           </p>
 
           <div class="pico-actions">
             <button
               class="pico-button pico-button-secondary"
               id="ws-info-button"
+              type="button"
             >
               Load WS info
             </button>
@@ -325,6 +405,7 @@
             <button
               class="pico-button pico-button-secondary"
               id="ws-connect-button"
+              type="button"
             >
               Test WebSocket
             </button>
