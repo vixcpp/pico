@@ -466,8 +466,11 @@
 
     button.addEventListener("click", () => {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const host = window.location.hostname || "localhost";
-      const url = `${protocol}//${host}:9090/`;
+      const host =
+        window.location.protocol === "https:"
+          ? window.location.host
+          : `${window.location.hostname || "localhost"}:9090`;
+      const url = `${protocol}//${host}/ws`;
 
       setOutput("#ws-output", `Connecting to ${url}…`);
 
@@ -523,7 +526,7 @@
       socket.addEventListener("error", () => {
         push("error: WebSocket connection failed");
         push(
-          "Check that websocket.enabled=true and websocket.port=9090 in .env",
+          "Check that WebSocket is reachable at /ws through the current host.",
         );
       });
     });
