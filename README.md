@@ -2,9 +2,9 @@
 
 Pico is a small production-style backend application built with **Vix.cpp**.
 
-**Website:** https://pico.vixcpp.com
-**Runtime:** Vix.cpp
-**Purpose:** production-style validation app for Vix.cpp modules
+**Website:** https://pico.vixcpp.com \
+**Runtime:** Vix.cpp \
+**Purpose:** production-style validation app for Vix.cpp modules \
 
 Pico is not a framework and it is not a separate runtime. It is a real application used to validate how Vix.cpp modules work together in one backend project.
 
