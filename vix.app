@@ -13,6 +13,7 @@ sources = [
   "src/pico/app/AppBootstrap.cpp",
 
   "src/pico/support/HttpResponses.cpp",
+  "src/pico/support/HttpQuery.cpp",
   "src/pico/support/JsonHelpers.cpp",
 
   "src/pico/domain/models/Event.cpp",

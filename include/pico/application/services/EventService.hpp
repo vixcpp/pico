@@ -81,6 +81,17 @@ namespace pico::application::services
         std::size_t limit) const;
 
     /**
+     * @brief Returns the latest stored events using pagination.
+     *
+     * @param limit Maximum number of events.
+     * @param offset Number of events to skip.
+     * @return Event list ordered from newest to oldest.
+     */
+    [[nodiscard]] std::vector<domain::models::Event> latest(
+        std::size_t limit,
+        std::size_t offset) const;
+
+    /**
      * @brief Counts all stored events.
      *
      * @return Total event count.

@@ -55,6 +55,13 @@ namespace pico::application::services
     return repository_->latest(limit);
   }
 
+  std::vector<domain::models::Event> EventService::latest(
+      std::size_t limit,
+      std::size_t offset) const
+  {
+    return repository_->latest(limit, offset);
+  }
+
   std::int64_t EventService::count() const
   {
     return repository_->count();

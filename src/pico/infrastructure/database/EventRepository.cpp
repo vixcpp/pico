@@ -73,14 +73,22 @@ namespace pico::infrastructure::database
   std::vector<domain::models::Event> EventRepository::latest(
       std::size_t limit) const
   {
+    return latest(limit, 0);
+  }
+
+  std::vector<domain::models::Event> EventRepository::latest(
+      std::size_t limit,
+      std::size_t offset) const
+  {
     const auto safe_limit = std::clamp<std::size_t>(limit, 1, 100);
 
     auto rows = provider_->database().query(
         "SELECT id, source, type, payload, created_at "
         "FROM events "
         "ORDER BY id DESC "
-        "LIMIT ?",
-        static_cast<std::int64_t>(safe_limit));
+        "LIMIT ? OFFSET ?",
+        static_cast<std::int64_t>(safe_limit),
+        static_cast<std::int64_t>(offset));
 
     std::vector<domain::models::Event> events{};
 

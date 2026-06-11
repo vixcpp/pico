@@ -15,10 +15,14 @@
  */
 
 #include <pico/presentation/controllers/EventController.hpp>
+
+#include <pico/support/HttpQuery.hpp>
 #include <pico/support/JsonHelpers.hpp>
+
 #include <string>
-#include <vix/json.hpp>
+
 #include <rix.hpp>
+#include <vix/json.hpp>
 
 namespace pico::presentation::controllers
 {
@@ -27,15 +31,27 @@ namespace pico::presentation::controllers
       application::services::EventService &events)
   {
     app.get("/api/events",
-            [&events](vix::Request &, vix::Response &res)
+            [&events](vix::Request &req, vix::Response &res)
             {
               using namespace vix::json;
 
-              const auto latest_events = events.latest(25);
+              const auto pagination = support::read_pagination(
+                  req,
+                  25,
+                  100);
+
+              const auto latest_events = events.latest(
+                  pagination.limit,
+                  pagination.offset);
+
+              const auto total = events.count();
 
               res.json(o(
                   "ok", true,
                   "count", latest_events.size(),
+                  "total", total,
+                  "limit", pagination.limit,
+                  "offset", pagination.offset,
                   "events", support::events_to_json(latest_events)));
             });
 

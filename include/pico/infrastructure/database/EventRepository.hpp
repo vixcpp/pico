@@ -80,6 +80,17 @@ namespace pico::infrastructure::database
         std::size_t limit) const;
 
     /**
+     * @brief Returns the latest runtime events using pagination.
+     *
+     * @param limit Maximum number of events to return.
+     * @param offset Number of events to skip.
+     * @return Event list ordered from newest to oldest.
+     */
+    [[nodiscard]] std::vector<domain::models::Event> latest(
+        std::size_t limit,
+        std::size_t offset) const;
+
+    /**
      * @brief Counts all stored events.
      *
      * @return Total number of stored events.
