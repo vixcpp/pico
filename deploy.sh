@@ -10,8 +10,9 @@ echo "==> Pull latest code"
 git fetch origin main
 git reset --hard origin/main
 
-echo "==> Install dependencies"
+echo "==> Update and install dependencies"
 "$VIX" registry sync
+"$VIX" update
 "$VIX" install
 
 echo "==> Build Pico"
