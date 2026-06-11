@@ -381,6 +381,117 @@
         </article>
       </section>
 
+      <section
+        class="pico-section pico-two-columns"
+        aria-label="Rix package diagnostics"
+      >
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span>Auth check</span>
+          </div>
+
+          <p class="pico-muted">
+            Register, login, validate a session, logout, and delete the current
+            diagnostic account through rix/auth using Pico's database-backed
+            auth service.
+          </p>
+
+          <form class="pico-form" id="auth-form">
+            <label>
+              Email
+              <input
+                id="auth-email"
+                name="email"
+                type="email"
+                value="pico-demo@example.com"
+                autocomplete="off"
+              />
+            </label>
+
+            <label>
+              Password
+              <input
+                id="auth-password"
+                name="password"
+                type="password"
+                value="correct-password"
+                autocomplete="off"
+              />
+            </label>
+
+            <div class="pico-actions">
+              <button
+                class="pico-button pico-button-secondary"
+                id="auth-register-button"
+                type="button"
+              >
+                Register
+              </button>
+
+              <button
+                class="pico-button pico-button-secondary"
+                id="auth-login-button"
+                type="button"
+              >
+                Login
+              </button>
+
+              <button
+                class="pico-button pico-button-secondary"
+                id="auth-check-button"
+                type="button"
+              >
+                Check session
+              </button>
+
+              <button
+                class="pico-button pico-button-secondary"
+                id="auth-logout-button"
+                type="button"
+              >
+                Logout
+              </button>
+
+              <button
+                class="pico-button pico-button-secondary"
+                id="auth-delete-button"
+                type="button"
+              >
+                Delete account
+              </button>
+            </div>
+          </form>
+
+          <pre class="pico-output" id="auth-output">Waiting for auth test…</pre>
+        </article>
+
+        <article class="pico-card">
+          <div class="pico-card-header">
+            <span>PDF check</span>
+          </div>
+
+          <p class="pico-muted">
+            Generate PDF files through rix/pdf from live Pico routes.
+          </p>
+
+          <div class="pico-actions">
+            <a class="pico-button pico-button-secondary" href="/api/pdf/basic">
+              Download basic PDF
+            </a>
+
+            <a class="pico-button pico-button-secondary" href="/api/pdf/events">
+              Download events PDF
+            </a>
+          </div>
+
+          <pre class="pico-output" id="pdf-output">
+PDF routes are ready:
+GET /api/pdf/basic
+GET /api/pdf/events</pre
+          >
+        </article>
+      </section>
+
       <section class="pico-section" aria-labelledby="ws-title">
         <div class="pico-section-heading">
           <p class="pico-eyebrow">Realtime</p>

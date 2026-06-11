@@ -16,11 +16,13 @@
 
 #include <pico/presentation/routes/RouteRegistry.hpp>
 
+#include <pico/presentation/controllers/AuthController.hpp>
 #include <pico/presentation/controllers/EventController.hpp>
 #include <pico/presentation/controllers/HealthController.hpp>
 #include <pico/presentation/controllers/HomeController.hpp>
 #include <pico/presentation/controllers/JobController.hpp>
 #include <pico/presentation/controllers/KvController.hpp>
+#include <pico/presentation/controllers/PdfController.hpp>
 #include <pico/presentation/controllers/StatusController.hpp>
 #include <pico/presentation/controllers/WebSocketController.hpp>
 
@@ -33,7 +35,9 @@ namespace pico::presentation::routes
       application::services::RuntimeStatusService &runtime_status,
       infrastructure::kv::PicoKvStore &kv,
       application::services::EventService &events,
-      application::services::JobService &jobs)
+      application::services::JobService &jobs,
+      application::services::AuthService &auth,
+      application::services::PdfService &pdfs)
   {
     controllers::HomeController::register_routes(app);
     controllers::HealthController::register_routes(app);
@@ -51,9 +55,17 @@ namespace pico::presentation::routes
         app,
         events);
 
+    controllers::AuthController::register_routes(
+        app,
+        auth);
+
     controllers::JobController::register_routes(
         app,
         jobs);
+
+    controllers::PdfController::register_routes(
+        app,
+        pdfs);
 
     controllers::WebSocketController::register_routes(
         app,

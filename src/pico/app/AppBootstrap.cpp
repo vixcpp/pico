@@ -16,8 +16,10 @@
 
 #include <pico/app/AppBootstrap.hpp>
 
+#include <pico/application/services/AuthService.hpp>
 #include <pico/application/services/EventService.hpp>
 #include <pico/application/services/JobService.hpp>
+#include <pico/application/services/PdfService.hpp>
 #include <pico/application/services/RuntimeStatusService.hpp>
 #include <pico/infrastructure/database/DatabaseProvider.hpp>
 #include <pico/infrastructure/database/EventRepository.hpp>
@@ -149,6 +151,13 @@ namespace pico::app
           kv,
           events};
 
+      application::services::AuthService auth{
+          database.database(),
+          events};
+
+      application::services::PdfService pdfs{
+          events};
+
       const auto boot_count = runtime_status.mark_boot();
 
       vix::log::info("Pico boot count {}", boot_count);
@@ -202,7 +211,9 @@ namespace pico::app
           runtime_status,
           kv,
           events,
-          jobs);
+          jobs,
+          auth,
+          pdfs);
 
       vix::log::info("Starting Pico on port {}", cfg.getServerPort());
 

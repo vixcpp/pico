@@ -25,6 +25,8 @@ sources = [
   "src/pico/infrastructure/websocket/PicoWebSocketServer.cpp",
 
   "src/pico/application/services/EventService.cpp",
+  "src/pico/application/services/AuthService.cpp",
+  "src/pico/application/services/PdfService.cpp",
   "src/pico/application/services/JobService.cpp",
   "src/pico/application/services/RuntimeStatusService.cpp",
 
@@ -36,7 +38,9 @@ sources = [
   "src/pico/presentation/controllers/StatusController.cpp",
   "src/pico/presentation/controllers/KvController.cpp",
   "src/pico/presentation/controllers/EventController.cpp",
+  "src/pico/presentation/controllers/AuthController.cpp",
   "src/pico/presentation/controllers/JobController.cpp",
+  "src/pico/presentation/controllers/PdfController.cpp",
   "src/pico/presentation/controllers/WebSocketController.cpp",
 ]
 

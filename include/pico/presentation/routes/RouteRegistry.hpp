@@ -17,8 +17,10 @@
 #ifndef PICO_PRESENTATION_ROUTES_ROUTE_REGISTRY_HPP
 #define PICO_PRESENTATION_ROUTES_ROUTE_REGISTRY_HPP
 
+#include <pico/application/services/AuthService.hpp>
 #include <pico/application/services/EventService.hpp>
 #include <pico/application/services/JobService.hpp>
+#include <pico/application/services/PdfService.hpp>
 #include <pico/application/services/RuntimeStatusService.hpp>
 #include <pico/infrastructure/kv/PicoKvStore.hpp>
 
@@ -46,13 +48,17 @@ namespace pico::presentation::routes
      * @param kv Durable KV store.
      * @param events Event service.
      * @param jobs Job service.
+     * @param auth Auth service.
+     * @param pdfs PDF service.
      */
     static void register_all(
         vix::App &app,
         application::services::RuntimeStatusService &runtime_status,
         infrastructure::kv::PicoKvStore &kv,
         application::services::EventService &events,
-        application::services::JobService &jobs);
+        application::services::JobService &jobs,
+        application::services::AuthService &auth,
+        application::services::PdfService &pdfs);
   };
 }
 

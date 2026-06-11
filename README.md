@@ -8,7 +8,7 @@ Pico is a production-style runtime validation application built with **Vix.cpp**
 
 Pico is not a framework and it is not a separate runtime. It is a real backend application used to verify that Vix.cpp modules work together under a practical application shape.
 
-It connects HTTP routing, middleware, static files, durable KV storage, SQLite events, ThreadPool jobs, WebSocket runtime behavior, runtime metrics, time utilities, filesystem utilities, and Rix CSV export.
+It connects HTTP routing, middleware, static files, durable KV storage, SQLite events, ThreadPool jobs, WebSocket runtime behavior, runtime metrics, time utilities, filesystem utilities, Rix CSV export, Rix Auth diagnostics, and Rix PDF generation.
 
 ## Why Pico exists
 
@@ -51,7 +51,10 @@ Pico currently exercises:
 - ThreadPool jobs
 - WebSocket runtime
 - Vix AttachedRuntime
+- paginated runtime events API
 - Rix CSV export
+- Rix Auth with database-backed users and sessions
+- Rix PDF generation
 - browser-based runtime dashboard
 
 ## Quick start
@@ -98,7 +101,10 @@ The dashboard observes and tests:
 - ThreadPool metrics
 - KV write/read behavior
 - background job execution
+- Rix Auth register/login/session/logout/account deletion checks
+- Rix PDF download checks
 - WebSocket ping/pong behavior
+- paginated runtime event loading
 - CSV export of runtime events
 
 The dashboard is served from `public/` through the Vix static file handler.
@@ -115,6 +121,8 @@ include/pico/
       EventService.hpp
       JobService.hpp
       RuntimeStatusService.hpp
+      AuthService.hpp
+      PdfService.hpp
 
   domain/
     models/
@@ -143,6 +151,8 @@ include/pico/
       KvController.hpp
       StatusController.hpp
       WebSocketController.hpp
+      AuthController.hpp
+      PdfController.hpp
 
     middleware/
       MiddlewareRegistry.hpp
@@ -153,6 +163,7 @@ include/pico/
   support/
     HttpResponses.hpp
     JsonHelpers.hpp
+    HttpQuery.hpp
 
 src/
   main.cpp
@@ -163,8 +174,10 @@ src/
 
     application/
       services/
+        AuthService.cpp
         EventService.cpp
         JobService.cpp
+        PdfService.cpp
         RuntimeStatusService.cpp
 
     domain/
@@ -187,11 +200,13 @@ src/
 
     presentation/
       controllers/
+        AuthController.cpp
         EventController.cpp
         HealthController.cpp
         HomeController.cpp
         JobController.cpp
         KvController.cpp
+        PdfController.cpp
         StatusController.cpp
         WebSocketController.cpp
 
@@ -290,6 +305,8 @@ It creates and connects:
 - routes
 - static files
 - templates
+- `AuthService`
+- `PdfService`
 
 Startup flow:
 
@@ -310,6 +327,8 @@ main.cpp
       -> register routes
       -> run HTTP
       -> optionally run HTTP + WebSocket together
+      -> create AuthService with database-backed Rix Auth
+      -> create PdfService for Rix PDF generation
 ```
 
 ## Runtime metrics
@@ -517,6 +536,112 @@ curl -X DELETE http://127.0.0.1:8080/api/kv/demo
 
 The status dashboard also performs a KV write/read test from the browser.
 
+## Rix Auth diagnostics
+
+Pico uses **Rix Auth** to validate authentication workflows through a real Vix.cpp backend.
+
+The auth diagnostics use database-backed Rix Auth stores, so users and sessions are persisted through Pico's SQLite database instead of memory-only storage.
+
+Pico currently exposes diagnostic auth routes for:
+
+```txt
+register
+login
+session validation
+logout
+account deletion
+```
+
+### Auth endpoints
+
+```txt
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/check
+POST   /api/auth/logout
+DELETE /api/auth/account
+```
+
+### Register a user
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"pico-demo@example.com","password":"correct-password"}'
+```
+
+### Login
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"pico-demo@example.com","password":"correct-password"}'
+```
+
+### Check a session
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/auth/check \
+  -H "Content-Type: application/json" \
+  -d '{"session_id":"session_xxx"}'
+```
+
+### Logout
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/auth/logout \
+  -H "Content-Type: application/json" \
+  -d '{"session_id":"session_xxx"}'
+```
+
+### Delete the authenticated diagnostic account
+
+```bash
+curl -X DELETE http://127.0.0.1:8080/api/auth/account \
+  -H "Content-Type: application/json" \
+  -d '{"session_id":"session_xxx"}'
+```
+
+The account deletion route authenticates the session first, revokes the user's sessions, then removes the user through the Rix Auth user store API.
+
+### Security note
+
+Pico's auth routes are diagnostic routes. They are useful for validating `rix/auth` in a real production-style app, but they are not a complete product account system.
+
+A real application should add stronger account flows, CSRF/session handling, email verification, password reset, and authorization rules.
+
+## Rix PDF generation
+
+Pico uses **Rix PDF** to validate PDF generation through the Vix HTTP runtime.
+
+### PDF endpoints
+
+```txt
+GET /api/pdf/basic
+GET /api/pdf/events
+```
+
+### Generate a basic diagnostic PDF
+
+```bash
+curl -L http://127.0.0.1:8080/api/pdf/basic -o pico-basic.pdf
+```
+
+### Generate a PDF containing recent runtime events
+
+```bash
+curl -L http://127.0.0.1:8080/api/pdf/events -o pico-events.pdf
+```
+
+The PDF routes generate documents through the unified Rix facade:
+
+```cpp
+rix.pdf.document()
+rix.pdf.write(...)
+```
+
+The events PDF reads recent SQLite runtime events and renders them into a PDF table.
+
 ## Background jobs
 
 Pico uses the Vix ThreadPool through `PicoThreadPool`.
@@ -601,6 +726,7 @@ GET    /api/status
 GET    /api/threadpool
 
 POST   /api/kv
+POST   /api/kv/read
 GET    /api/kv/:key
 DELETE /api/kv/:key
 
@@ -608,8 +734,17 @@ GET    /api/events
 POST   /api/events
 GET    /api/events.csv
 
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/check
+POST   /api/auth/logout
+DELETE /api/auth/account
+
 POST   /api/jobs
 POST   /api/jobs/slow
+
+GET    /api/pdf/basic
+GET    /api/pdf/events
 
 GET    /api/ws/info
 GET    /api/ws/metrics
@@ -827,6 +962,32 @@ CSV export:
 curl -L http://127.0.0.1:8080/api/events.csv -o pico-events.csv
 ```
 
+### Paginated events
+
+```bash
+curl "http://127.0.0.1:8080/api/events?limit=20&offset=0"
+curl "http://127.0.0.1:8080/api/events?limit=20&offset=20"
+```
+
+### Auth diagnostics
+
+```bash
+curl -X POST http://127.0.0.1:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"pico-demo@example.com","password":"correct-password"}'
+
+curl -X POST http://127.0.0.1:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"pico-demo@example.com","password":"correct-password"}'
+```
+
+### PDF generation
+
+```bash
+curl -L http://127.0.0.1:8080/api/pdf/basic -o pico-basic.pdf
+curl -L http://127.0.0.1:8080/api/pdf/events -o pico-events.pdf
+```
+
 KV write/read:
 
 ```bash
@@ -910,6 +1071,8 @@ C++ source
   -> WebSocket
   -> runtime dashboard
   -> Rix CSV export
+  -> Rix Auth diagnostics
+  -> Rix PDF generation
 ```
 
 Pico should stay focused: small enough to understand, real enough to catch integration problems.

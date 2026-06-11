@@ -13,6 +13,10 @@
     total: null,
   };
 
+  const authState = {
+    sessionId: "",
+  };
+
   const setText = (selector, value) => {
     const element = $(selector);
 
@@ -73,6 +77,16 @@
   const postJson = async (url, payload) => {
     return fetchJson(url, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  };
+
+  const deleteJson = async (url, payload) => {
+    return fetchJson(url, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
@@ -391,6 +405,193 @@
     });
   };
 
+  const setupAuthForm = () => {
+    const form = $("#auth-form");
+
+    if (!form) {
+      return;
+    }
+
+    const readCredentials = () => {
+      return {
+        email: $("#auth-email")?.value?.trim() || "",
+        password: $("#auth-password")?.value || "",
+      };
+    };
+
+    const requireCredentials = () => {
+      const credentials = readCredentials();
+
+      if (!credentials.email) {
+        setOutput("#auth-output", "Email is required.");
+        return null;
+      }
+
+      if (!credentials.password) {
+        setOutput("#auth-output", "Password is required.");
+        return null;
+      }
+
+      return credentials;
+    };
+
+    const registerButton = $("#auth-register-button");
+    const loginButton = $("#auth-login-button");
+    const checkButton = $("#auth-check-button");
+    const logoutButton = $("#auth-logout-button");
+    const deleteButton = $("#auth-delete-button");
+
+    if (registerButton) {
+      registerButton.addEventListener("click", async () => {
+        const credentials = requireCredentials();
+
+        if (!credentials) {
+          return;
+        }
+
+        try {
+          setOutput("#auth-output", "Registering user…");
+
+          const result = await postJson("/api/auth/register", credentials);
+
+          setOutput("#auth-output", result);
+
+          await loadStatus();
+          await loadEvents({ reset: true });
+        } catch (error) {
+          setOutput("#auth-output", {
+            ok: false,
+            error: error.message,
+          });
+        }
+      });
+    }
+
+    if (loginButton) {
+      loginButton.addEventListener("click", async () => {
+        const credentials = requireCredentials();
+
+        if (!credentials) {
+          return;
+        }
+
+        try {
+          setOutput("#auth-output", "Logging in…");
+
+          const result = await postJson("/api/auth/login", credentials);
+
+          authState.sessionId = result?.session?.id || "";
+
+          setOutput("#auth-output", {
+            ...result,
+            saved_session_id: authState.sessionId ? "yes" : "no",
+          });
+
+          await loadStatus();
+          await loadEvents({ reset: true });
+        } catch (error) {
+          setOutput("#auth-output", {
+            ok: false,
+            error: error.message,
+          });
+        }
+      });
+    }
+
+    if (checkButton) {
+      checkButton.addEventListener("click", async () => {
+        if (!authState.sessionId) {
+          setOutput("#auth-output", "Login first to get a session id.");
+          return;
+        }
+
+        try {
+          setOutput("#auth-output", "Checking session…");
+
+          const result = await postJson("/api/auth/check", {
+            session_id: authState.sessionId,
+          });
+
+          setOutput("#auth-output", result);
+
+          await loadStatus();
+          await loadEvents({ reset: true });
+        } catch (error) {
+          setOutput("#auth-output", {
+            ok: false,
+            error: error.message,
+          });
+        }
+      });
+    }
+
+    if (logoutButton) {
+      logoutButton.addEventListener("click", async () => {
+        if (!authState.sessionId) {
+          setOutput("#auth-output", "Login first to get a session id.");
+          return;
+        }
+
+        try {
+          setOutput("#auth-output", "Logging out…");
+
+          const result = await postJson("/api/auth/logout", {
+            session_id: authState.sessionId,
+          });
+
+          authState.sessionId = "";
+
+          setOutput("#auth-output", result);
+
+          await loadStatus();
+          await loadEvents({ reset: true });
+        } catch (error) {
+          setOutput("#auth-output", {
+            ok: false,
+            error: error.message,
+          });
+        }
+      });
+    }
+
+    if (deleteButton) {
+      deleteButton.addEventListener("click", async () => {
+        if (!authState.sessionId) {
+          setOutput("#auth-output", "Login first to get a session id.");
+          return;
+        }
+
+        const confirmed = window.confirm(
+          "Delete this diagnostic account? This cannot be undone.",
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          setOutput("#auth-output", "Deleting account…");
+
+          const result = await deleteJson("/api/auth/account", {
+            session_id: authState.sessionId,
+          });
+
+          authState.sessionId = "";
+
+          setOutput("#auth-output", result);
+
+          await loadStatus();
+          await loadEvents({ reset: true });
+        } catch (error) {
+          setOutput("#auth-output", {
+            ok: false,
+            error: error.message,
+          });
+        }
+      });
+    }
+  };
+
   const setupJobForm = () => {
     const form = $("#job-form");
 
@@ -537,6 +738,7 @@
     setupEventsPagination();
     setupKvForm();
     setupJobForm();
+    setupAuthForm();
     setupWebSocketInfoButton();
     setupWebSocketTestButton();
 
@@ -548,7 +750,6 @@
       await loadEvents({ reset: true });
     }
   };
-
   document.addEventListener("DOMContentLoaded", () => {
     init().catch((error) => {
       console.error(error);
