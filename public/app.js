@@ -756,3 +756,163 @@
     });
   });
 })();
+
+/* ============================================================
+ * Home page — live terminal (index.html only)
+ * Self-contained IIFE. Activates only when #ph-terminal-body
+ * exists, so it stays inert on the status dashboard.
+ * ============================================================ */
+(() => {
+  "use strict";
+
+  const term = document.getElementById("ph-terminal-body");
+  if (!term) return;
+
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  const esc = (s) =>
+    String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+
+  const highlightJson = (json) => {
+    return esc(json).replace(
+      /("(\\.|[^"\\])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+-]?\d+)?)/g,
+      (match) => {
+        let cls = "ph-j-num";
+        if (/^"/.test(match)) {
+          cls = /:$/.test(match) ? "ph-j-key" : "ph-j-str";
+        } else if (/true|false/.test(match)) {
+          cls = "ph-j-bool";
+        } else if (/null/.test(match)) {
+          cls = "ph-j-punct";
+        }
+        return `<span class="${cls}">${match}</span>`;
+      },
+    );
+  };
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const CMD = "curl -s https://pico.vixcpp.com/api/status | jq";
+
+  const renderPrompt = (typed, withCursor) =>
+    `<span class="ph-Terminal__prompt">$ </span>` +
+    `<span class="ph-Terminal__cmd">${esc(typed)}</span>` +
+    (withCursor ? `<span class="ph-Terminal__cursor"></span>` : "");
+
+  const typeCommand = async () => {
+    if (prefersReduced) {
+      term.innerHTML = renderPrompt(CMD, false) + "\n\n";
+      return;
+    }
+    for (let i = 0; i <= CMD.length; i += 1) {
+      term.innerHTML = renderPrompt(CMD.slice(0, i), true);
+      await sleep(18 + Math.random() * 24);
+    }
+    term.innerHTML = renderPrompt(CMD, false) + "\n\n";
+  };
+
+  const shape = (data) => {
+    const out = {
+      app: data?.app ?? "pico",
+      runtime: data?.runtime ?? "Vix.cpp",
+      status: data?.status ?? "running",
+      uptime_seconds: data?.uptime_seconds ?? 0,
+      boot_count: data?.boot_count ?? 0,
+      http_requests: data?.http_requests ?? 0,
+      ws_messages: data?.ws_messages ?? 0,
+      events: { total: data?.events?.total ?? 0 },
+    };
+    const tp = data?.threadpool;
+    if (tp) {
+      out.threadpool = {
+        running: tp.running ?? true,
+        workers: tp?.metrics?.workers ?? 0,
+        completed: tp?.stats?.completed ?? 0,
+      };
+    }
+    return out;
+  };
+
+  const SAMPLE = {
+    app: "pico",
+    runtime: "Vix.cpp",
+    status: "running",
+    uptime_seconds: 4215,
+    boot_count: 7,
+    http_requests: 1284,
+    ws_messages: 42,
+    events: { total: 58 },
+    threadpool: { running: true, workers: 8, completed: 134 },
+  };
+
+  const streamJson = async (obj, { live }) => {
+    const base = term.innerHTML;
+    const json = JSON.stringify(obj, null, 2);
+    const highlighted = highlightJson(json);
+
+    if (prefersReduced) {
+      term.innerHTML = base + highlighted;
+      return;
+    }
+
+    const lines = highlighted.split("\n");
+    let shown = "";
+    for (let i = 0; i < lines.length; i += 1) {
+      shown += (i ? "\n" : "") + lines[i];
+      term.innerHTML = base + shown;
+      term.scrollTop = term.scrollHeight;
+      await sleep(28);
+    }
+
+    if (!live) {
+      term.innerHTML =
+        base +
+        shown +
+        `\n\n<span class="ph-Terminal__prompt"># offline sample — start Pico to see live data</span>`;
+    }
+  };
+
+  const run = async () => {
+    await typeCommand();
+    try {
+      const res = await fetch("/api/status", {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      await streamJson(shape(data), { live: true });
+    } catch {
+      await streamJson(SAMPLE, { live: false });
+    }
+  };
+
+  const boot = () => {
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              obs.disconnect();
+              run();
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+      io.observe(term);
+    } else {
+      run();
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();

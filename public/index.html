@@ -1,34 +1,25 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Basic -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pico · Native C++ Runtime App powered by Vix.cpp</title>
+    <title>Pico · Native C++ runtime app powered by Vix.cpp</title>
 
-    <!-- Primary meta -->
     <meta
       name="description"
-      content="Pico is a compact native C++ backend app powered by Vix.cpp. It demonstrates HTTP routes, durable KV state, SQLite events, background jobs, WebSocket diagnostics, and live runtime inspection."
+      content="Pico is a compact native C++ backend built with Vix.cpp. One running app for HTTP routes, durable KV state, SQLite events, background jobs, WebSocket diagnostics, and live runtime inspection."
     />
-
     <meta name="author" content="Gaspard Kirira" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pico.vixcpp.com/" />
 
-    <!-- Theme / Mobile -->
-    <meta name="theme-color" content="#101827" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f7f7f7" />
+    <meta name="color-scheme" content="light" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
     <meta name="apple-mobile-web-app-title" content="Pico" />
 
-    <!-- Favicons / App icons -->
     <link rel="icon" href="/assets/pwa/favicon.ico" />
     <link
       rel="icon"
@@ -47,20 +38,17 @@
       sizes="180x180"
       href="/assets/pwa/apple-touch-icon.png"
     />
-
-    <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pico" />
     <meta
       property="og:title"
-      content="Pico · Native C++ Runtime App powered by Vix.cpp"
+      content="Pico · Native C++ runtime app powered by Vix.cpp"
     />
     <meta
       property="og:description"
-      content="Pico is a compact native C++ backend app powered by Vix.cpp. It demonstrates HTTP routes, durable KV state, SQLite events, background jobs, WebSocket diagnostics, and live runtime inspection."
+      content="A compact native C++ backend app that validates real Vix.cpp runtime features: HTTP, durable state, SQLite events, jobs, WebSocket diagnostics, and live runtime inspection."
     />
     <meta property="og:url" content="https://pico.vixcpp.com/" />
     <meta
@@ -69,11 +57,10 @@
     />
     <meta property="og:image:alt" content="Pico powered by Vix.cpp" />
 
-    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Pico · Native C++ Runtime App powered by Vix.cpp"
+      content="Pico · Native C++ runtime app powered by Vix.cpp"
     />
     <meta
       name="twitter:description"
@@ -85,151 +72,127 @@
     />
     <meta name="twitter:site" content="@vix_cpp" />
 
-    <!-- Styles -->
+    <link rel="preload" as="style" href="/app.css" />
     <link rel="stylesheet" href="/app.css" />
   </head>
 
   <body>
-    <header class="pico-header">
-      <nav class="pico-nav" aria-label="Main navigation">
-        <a class="pico-brand" href="/" aria-label="Pico home">
-          <span class="pico-brand-mark" aria-hidden="true">
-            <svg
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient
-                  id="pico-logo-left"
-                  x1="5"
-                  y1="6"
-                  x2="18"
-                  y2="30"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0%" stop-color="#d4fcd4" />
-                  <stop offset="55%" stop-color="#4ade80" />
-                  <stop offset="100%" stop-color="#22c55e" />
-                </linearGradient>
+    <!-- ============================== APP BAR ============================== -->
+    <header class="ph-AppBar">
+      <a class="ph-AppBar__brand" href="/" aria-label="Pico home">
+        <span class="ph-AppBar__logo" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 5L11 19"
+              stroke="#fff"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M18 5L13 19"
+              stroke="#fff"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span class="ph-AppBar__title">Pico</span>
+      </a>
 
-                <linearGradient
-                  id="pico-logo-right"
-                  x1="31"
-                  y1="6"
-                  x2="18"
-                  y2="30"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0%" stop-color="#22c55e" />
-                  <stop offset="100%" stop-color="#15803d" />
-                </linearGradient>
-              </defs>
+      <span class="ph-AppBar__spacer"></span>
 
-              <polygon
-                points="5,6 12,6 18,28 14,28"
-                fill="url(#pico-logo-left)"
-              />
-              <polygon
-                points="31,6 24,6 18,28 22,28"
-                fill="url(#pico-logo-right)"
-              />
-
-              <line
-                x1="9"
-                y1="16"
-                x2="13.5"
-                y2="29"
-                stroke="#bbf7d0"
-                stroke-width="1.1"
-                stroke-linecap="round"
-                opacity="0.7"
-              />
-            </svg>
-          </span>
-
-          <span class="pico-brand-text">Pico</span>
-        </a>
-
-        <div class="pico-nav-links">
-          <a href="/" aria-current="page">Home</a>
-          <a href="/status.html">Status</a>
-          <a href="/api/health">API Health</a>
-          <a href="/api/status">Runtime JSON</a>
-        </div>
+      <nav class="ph-AppBar__nav" aria-label="Main">
+        <a href="#layers">Runtime</a>
+        <a href="#endpoints">Endpoints</a>
+        <a href="/api/status">JSON</a>
       </nav>
+
+      <a class="ph-AppBar__cta" href="/status.html">Open dashboard</a>
     </header>
 
-    <main class="pico-main">
-      <section class="pico-hero pico-hero-compact">
-        <div class="pico-hero-content">
-          <p class="pico-eyebrow">Vix.cpp runtime app</p>
+    <main>
+      <!-- ============================== HERO ============================== -->
+      <section class="ph-wrap ph-Hero">
+        <div class="ph-Hero__content">
+          <p class="ph-eyebrow">Vix.cpp runtime app</p>
 
-          <h1>Native C++. Real backend runtime.</h1>
+          <h1>
+            Native C++.<br /><span class="muted">A real backend runtime.</span>
+          </h1>
 
-          <p class="pico-hero-text">
-            Pico is a compact C++ backend built with Vix.cpp. It validates real
-            runtime features in one running app: HTTP routes, durable KV state,
-            SQLite events, background jobs, and WebSocket diagnostics.
+          <p class="ph-Hero__text">
+            Pico is a compact C++ backend built with Vix.cpp. It runs HTTP
+            routes, durable KV state, SQLite events, background jobs, and
+            WebSocket diagnostics — in one process you can inspect live.
           </p>
 
-          <div class="pico-actions">
-            <a class="pico-button pico-button-primary" href="/status.html">
+          <div class="ph-Hero__actions">
+            <a class="ph-btn ph-btn--primary" href="/status.html">
               Inspect live runtime
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h14" />
+                <path d="M13 6l6 6-6 6" />
+              </svg>
             </a>
-
-            <a class="pico-button pico-button-secondary" href="/api/status">
-              View runtime JSON
-            </a>
+            <a class="ph-btn" href="/api/status">View runtime JSON</a>
           </div>
         </div>
 
-        <aside class="pico-card pico-runtime-card" aria-label="Runtime summary">
-          <div class="pico-card-header">
-            <span class="pico-status-dot"></span>
-            <span>Runtime summary</span>
+        <!-- Signature: live terminal -->
+        <div class="ph-Terminal" aria-label="Live runtime status">
+          <div class="ph-Terminal__bar">
+            <span class="ph-Terminal__dots" aria-hidden="true"
+              ><i></i><i></i><i></i
+            ></span>
+            <span class="ph-Terminal__title">pico — status</span>
+            <span class="ph-Terminal__live"><i></i> live</span>
           </div>
-
-          <dl class="pico-runtime-list">
-            <div>
-              <dt>Language</dt>
-              <dd>C++</dd>
-            </div>
-
-            <div>
-              <dt>Runtime</dt>
-              <dd>Vix.cpp</dd>
-            </div>
-
-            <div>
-              <dt>HTTP</dt>
-              <dd>Enabled</dd>
-            </div>
-
-            <div>
-              <dt>Realtime</dt>
-              <dd>WebSocket</dd>
-            </div>
-
-            <div>
-              <dt>Storage</dt>
-              <dd>KV + SQLite</dd>
-            </div>
-          </dl>
-        </aside>
+          <pre
+            class="ph-Terminal__body"
+            id="ph-terminal-body"
+          ><span class="ph-Terminal__prompt">$ </span><span class="ph-Terminal__cursor"></span></pre>
+        </div>
       </section>
 
-      <section
-        class="pico-section pico-section-compact"
-        aria-labelledby="proof-title"
-      >
-        <div class="pico-section-heading">
-          <p class="pico-eyebrow">What it proves</p>
-          <h2 id="proof-title">One small app. Multiple runtime layers.</h2>
+      <!-- ============================== WHAT IT PROVES ============================== -->
+      <section class="ph-wrap ph-Section" id="proves">
+        <div class="ph-Section__head">
+          <h2>One small app, several runtime layers.</h2>
+          <p class="ph-Section__sub">
+            Pico exists to exercise the parts of Vix.cpp that only show up in a
+            running process — not a demo that mocks them away.
+          </p>
         </div>
 
-        <div class="pico-grid pico-grid-compact">
-          <article class="pico-card">
+        <div class="ph-Grid">
+          <article class="ph-Card">
+            <div class="ph-Card__icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path
+                  d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                />
+              </svg>
+            </div>
             <h3>HTTP runtime</h3>
             <p>
               Routes, middleware, static files, health checks, and JSON APIs run
@@ -237,55 +200,212 @@
             </p>
           </article>
 
-          <article class="pico-card">
+          <article class="ph-Card">
+            <div class="ph-Card__icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+                <path d="M3 12a9 3 0 0 0 18 0" />
+              </svg>
+            </div>
             <h3>Durable state</h3>
             <p>
-              Runtime counters and KV values survive through persistent storage
-              so restart behavior can be observed.
+              Runtime counters and KV values persist through restarts, so you
+              can watch state survive a reboot.
             </p>
           </article>
 
-          <article class="pico-card">
+          <article class="ph-Card">
+            <div class="ph-Card__icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 3v18h18" />
+                <path d="M7 14l4-4 3 3 5-6" />
+              </svg>
+            </div>
             <h3>Live diagnostics</h3>
             <p>
-              The status dashboard exposes metrics, events, ThreadPool jobs, and
-              WebSocket checks from the browser.
+              The dashboard exposes metrics, events, ThreadPool jobs, and
+              WebSocket checks straight from the browser.
             </p>
           </article>
         </div>
       </section>
 
-      <section
-        class="pico-section pico-section-compact"
-        aria-labelledby="api-title"
-      >
-        <div class="pico-section-heading pico-section-heading-row">
-          <div>
-            <p class="pico-eyebrow">Runtime inspection</p>
-            <h2 id="api-title">Useful endpoints</h2>
-          </div>
-
-          <a class="pico-button pico-button-secondary" href="/status.html">
-            Open dashboard
-          </a>
+      <!-- ============================== RUNTIME LAYERS ============================== -->
+      <section class="ph-wrap ph-Section" id="layers">
+        <div class="ph-Section__head">
+          <h2>What runs inside Pico</h2>
+          <p class="ph-Section__sub">
+            Every layer is a real Vix.cpp subsystem, wired together in one
+            binary.
+          </p>
         </div>
 
-        <div class="pico-endpoints">
-          <a href="/api/health">GET /api/health</a>
-          <a href="/api/status">GET /api/status</a>
-          <a href="/api/threadpool">GET /api/threadpool</a>
-          <a href="/api/events">GET /api/events</a>
-          <a href="/api/events.csv">GET /api/events.csv</a>
-          <a href="/api/ws/metrics">GET /api/ws/metrics</a>
+        <div class="ph-Layers">
+          <div class="ph-Layer">
+            <div class="ph-Layer__mark">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 17l6-6-6-6" />
+                <path d="M12 19h8" />
+              </svg>
+            </div>
+            <div class="ph-Layer__body">
+              <h4>HTTP server</h4>
+              <p>
+                Routing, middleware, and JSON responses on the Vix app layer.
+              </p>
+            </div>
+          </div>
+
+          <div class="ph-Layer">
+            <div class="ph-Layer__mark">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+              </svg>
+            </div>
+            <div class="ph-Layer__body">
+              <h4>KV + SQLite</h4>
+              <p>Durable counters in KV; an append-only event log in SQLite.</p>
+            </div>
+          </div>
+
+          <div class="ph-Layer">
+            <div class="ph-Layer__mark">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+              </svg>
+            </div>
+            <div class="ph-Layer__body">
+              <h4>ThreadPool jobs</h4>
+              <p>
+                Background work submitted to the Vix ThreadPool, with metrics.
+              </p>
+            </div>
+          </div>
+
+          <div class="ph-Layer">
+            <div class="ph-Layer__mark">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                <line x1="12" y1="20" x2="12.01" y2="20" />
+              </svg>
+            </div>
+            <div class="ph-Layer__body">
+              <h4>WebSocket</h4>
+              <p>A realtime channel with live diagnostics from the browser.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== ENDPOINTS ============================== -->
+      <section class="ph-wrap ph-Section" id="endpoints">
+        <div class="ph-Section__head ph-Section__head--row">
+          <div>
+            <h2>Endpoints</h2>
+            <p class="ph-Section__sub">
+              Hit them directly, or drive them from the dashboard.
+            </p>
+          </div>
+          <a class="ph-btn" href="/status.html">Open dashboard</a>
+        </div>
+
+        <div class="ph-Endpoints">
+          <a class="ph-Endpoint" href="/api/health"
+            ><span class="ph-Endpoint__verb">GET</span> /api/health</a
+          >
+          <a class="ph-Endpoint" href="/api/status"
+            ><span class="ph-Endpoint__verb">GET</span> /api/status</a
+          >
+          <a class="ph-Endpoint" href="/api/threadpool"
+            ><span class="ph-Endpoint__verb">GET</span> /api/threadpool</a
+          >
+          <a class="ph-Endpoint" href="/api/events"
+            ><span class="ph-Endpoint__verb">GET</span> /api/events</a
+          >
+          <a class="ph-Endpoint" href="/api/events.csv"
+            ><span class="ph-Endpoint__verb">GET</span> /api/events.csv</a
+          >
+          <a class="ph-Endpoint" href="/api/ws/metrics"
+            ><span class="ph-Endpoint__verb">GET</span> /api/ws/metrics</a
+          >
+        </div>
+
+        <!-- CTA band -->
+        <div class="ph-Band">
+          <h2>See the runtime, live.</h2>
+          <p>
+            Open the dashboard to write KV values, run jobs, exercise auth, and
+            watch events land in SQLite — in real time.
+          </p>
+          <div class="ph-Band__actions">
+            <a class="ph-btn ph-btn--primary" href="/status.html"
+              >Open the dashboard</a
+            >
+            <a class="ph-btn" href="/api/status">Read the JSON</a>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="pico-footer">
-      <p>
-        Pico is powered by
-        <strong>Vix.cpp</strong>.
-      </p>
+    <!-- ============================== FOOTER ============================== -->
+    <footer class="ph-Footer">
+      <div class="ph-Footer__inner">
+        <p>
+          Pico is powered by <strong>Vix.cpp</strong> · Built by Gaspard Kirira
+        </p>
+        <nav class="ph-Footer__links" aria-label="Footer">
+          <a href="/status.html">Status</a>
+          <a href="/api/health">Health</a>
+          <a href="/api/status">Runtime JSON</a>
+        </nav>
+      </div>
     </footer>
 
     <script src="/app.js" defer></script>

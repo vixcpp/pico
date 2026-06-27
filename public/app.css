@@ -1,30 +1,59 @@
+/* =========================================================
+   Pico · home (index)
+   Visual system: Vix Note — dense chrome, neutral greys,
+   Vix amber/orange accent. Rich landing with a live terminal.
+   Shares the ps- token family used by the status dashboard.
+   ========================================================= */
+
 :root {
-  --pico-bg: #f7f8fa;
-  --pico-surface: #ffffff;
-  --pico-surface-soft: #f9fafb;
+  color-scheme: light;
 
-  --pico-text: #111827;
-  --pico-muted: #6b7280;
-  --pico-soft-text: #374151;
+  --ps-bg: #f3f3f3;
+  --ps-content-bg: #ffffff;
+  --ps-appbar-bg: #f7f7f7;
+  --ps-surface: #ffffff;
+  --ps-surface-soft: #fafafa;
+  --ps-hover: #ededed;
 
-  --pico-border: #e5e7eb;
-  --pico-border-strong: #d1d5db;
+  --ps-border: #e2e2e2;
+  --ps-border-strong: #d4d4d4;
+  --ps-border-soft: #eeeeee;
 
-  --pico-primary: #ff9900;
-  --pico-primary-dark: #d97706;
-  --pico-primary-soft: #fff7ed;
+  --ps-text0: #000000;
+  --ps-text1: #212121;
+  --ps-text2: #5f6368;
+  --ps-text3: #9aa0a6;
 
-  --pico-success: #16a34a;
-  --pico-danger: #dc2626;
+  --ps-brand0: #b2541a;
+  --ps-brand1: #f37726;
+  --ps-brand2: #f9aa7c;
+  --ps-brand3: #fde0cd;
 
-  --pico-radius: 20px;
-  --pico-radius-sm: 14px;
+  --ps-accent: #1976d2;
 
-  --pico-shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.06);
-  --pico-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  --pico-shadow-lg: 0 28px 70px rgba(15, 23, 42, 0.12);
+  --ps-green: #2e7d32;
+  --ps-green-soft: #e8f5e9;
 
-  --pico-header-height: 72px;
+  --ps-term-bg: #1e1b16;
+  --ps-term-border: #3a342b;
+  --ps-term-text: #f3ead6;
+  --ps-term-muted: #b59b73;
+  --ps-term-key: #f9aa7c;
+  --ps-term-str: #b6d99b;
+  --ps-term-num: #e8b974;
+  --ps-term-bool: #d98a6a;
+
+  --ps-ui-font:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial,
+    sans-serif;
+  --ps-code-font:
+    "Menlo", "Consolas", "SFMono-Regular", "DejaVu Sans Mono",
+    "Liberation Mono", monospace;
+
+  --ps-appbar-h: 48px;
+  --ps-radius: 10px;
+  --ps-radius-sm: 6px;
+  --ps-maxw: 1080px;
 }
 
 * {
@@ -32,24 +61,17 @@
 }
 
 html {
-  min-height: 100%;
   scroll-behavior: smooth;
 }
 
 body {
-  min-height: 100%;
   margin: 0;
-  background: var(--pico-bg);
-  color: var(--pico-text);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  line-height: 1.6;
+  background: var(--ps-bg);
+  color: var(--ps-text1);
+  font-family: var(--ps-ui-font);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -57,740 +79,667 @@ a {
   text-decoration: none;
 }
 
-button,
-input {
-  font: inherit;
-}
-
 button {
+  font: inherit;
   cursor: pointer;
 }
 
-strong {
-  font-weight: 750;
+::selection {
+  background: var(--ps-brand3);
+  color: var(--ps-brand0);
 }
 
-/* Header */
+:focus-visible {
+  outline: 2px solid var(--ps-brand1);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
-.pico-header {
+/* =========================================================
+   App bar
+   ========================================================= */
+
+.ph-AppBar {
   position: sticky;
   top: 0;
-  z-index: 20;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.85);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(18px);
-}
-
-.pico-nav {
+  z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  min-height: var(--pico-header-height);
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  gap: 24px;
+  gap: 16px;
+  height: var(--ps-appbar-h);
+  padding: 0 16px;
+  background: rgba(247, 247, 247, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--ps-border);
+  user-select: none;
 }
 
-.pico-brand {
+.ph-AppBar__brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.pico-brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--pico-border);
-  border-radius: 12px;
-  background: var(--pico-surface);
-  box-shadow: var(--pico-shadow-sm);
-  flex-shrink: 0;
-}
-
-.pico-brand-mark svg {
-  display: block;
-  width: 23px;
-  height: 23px;
-}
-
-.pico-brand-text {
-  font-size: 1.05rem;
-}
-
-.pico-nav-links {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.pico-nav-links a {
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--pico-muted);
-  font-size: 0.93rem;
+  gap: 9px;
   font-weight: 650;
-  transition:
-    background 160ms ease,
-    color 160ms ease;
+  letter-spacing: -0.01em;
 }
 
-.pico-nav-links a:hover,
-.pico-nav-links a[aria-current="page"] {
-  background: var(--pico-primary-soft);
-  color: var(--pico-text);
-}
-
-/* Layout */
-
-.pico-main {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 56px 0 72px;
-}
-
-.pico-hero {
+.ph-AppBar__logo {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
-  gap: 28px;
-  align-items: center;
-  min-height: calc(100vh - var(--pico-header-height) - 96px);
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--ps-brand1);
+  flex: 0 0 auto;
 }
 
-.pico-hero-content {
-  max-width: 760px;
+.ph-AppBar__logo svg {
+  width: 16px;
+  height: 16px;
 }
 
-.pico-eyebrow {
-  margin: 0 0 12px;
-  color: var(--pico-primary-dark);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.ph-AppBar__title {
+  font-size: 14px;
+  color: var(--ps-text1);
 }
 
-.pico-hero h1,
-.pico-page-title h1 {
-  margin: 0;
-  color: var(--pico-text);
-  font-size: clamp(2.6rem, 8vw, 5.6rem);
-  line-height: 0.95;
-  letter-spacing: -0.08em;
+.ph-AppBar__spacer {
+  flex: 1 1 auto;
 }
 
-.pico-hero-text,
-.pico-page-title p,
-.pico-section-heading p,
-.pico-muted {
-  color: var(--pico-muted);
-}
-
-.pico-hero-text {
-  max-width: 680px;
-  margin: 24px 0 0;
-  font-size: clamp(1.02rem, 2vw, 1.22rem);
-}
-
-/* Buttons */
-
-.pico-actions {
+.ph-AppBar__nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 2px;
+}
+
+.ph-AppBar__nav a {
+  padding: 6px 11px;
+  border-radius: var(--ps-radius-sm);
+  color: var(--ps-text2);
+  font-size: 13px;
+}
+
+.ph-AppBar__nav a:hover {
+  background: var(--ps-hover);
+  color: var(--ps-text1);
+}
+
+.ph-AppBar__cta {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-brand1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.12s;
+}
+
+.ph-AppBar__cta:hover {
+  background: var(--ps-brand0);
+}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
+.ph-wrap {
+  max-width: var(--ps-maxw);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.ph-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 16px;
+  padding: 4px 10px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 999px;
+  background: var(--ps-surface);
+  color: var(--ps-brand0);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.ph-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ps-brand1);
+  box-shadow: 0 0 0 3px var(--ps-brand3);
+}
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
+.ph-Hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 44px;
+  align-items: center;
+  padding: 72px 0 64px;
+}
+
+.ph-Hero__content {
+  max-width: 520px;
+}
+
+.ph-Hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4.6vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 680;
+  color: var(--ps-text0);
+}
+
+.ph-Hero h1 .muted {
+  color: var(--ps-text3);
+}
+
+.ph-Hero__text {
+  margin: 20px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ps-text2);
+}
+
+.ph-Hero__actions {
+  display: flex;
   flex-wrap: wrap;
+  gap: 10px;
   margin-top: 28px;
 }
 
-.pico-button {
+.ph-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 20px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-weight: 750;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-surface);
+  color: var(--ps-text1);
+  font-size: 13.5px;
+  font-weight: 600;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease,
-    border-color 160ms ease;
+    background 0.12s,
+    border-color 0.12s,
+    transform 0.08s;
 }
 
-.pico-button:hover {
-  transform: translateY(-1px);
+.ph-btn:active {
+  transform: translateY(0.5px);
 }
 
-.pico-button-primary {
-  background: var(--pico-primary);
-  color: #111827;
-  box-shadow: 0 14px 28px rgba(255, 153, 0, 0.24);
+.ph-btn:hover {
+  background: var(--ps-hover);
 }
 
-.pico-button-primary:hover {
-  background: #ffa31a;
-  box-shadow: 0 16px 34px rgba(255, 153, 0, 0.28);
+.ph-btn--primary {
+  border-color: var(--ps-brand1);
+  background: var(--ps-brand1);
+  color: #fff;
 }
 
-.pico-button-secondary {
-  border-color: var(--pico-border);
-  background: var(--pico-surface);
-  color: var(--pico-text);
-  box-shadow: var(--pico-shadow-sm);
+.ph-btn--primary:hover {
+  background: var(--ps-brand0);
+  border-color: var(--ps-brand0);
 }
 
-.pico-button-secondary:hover {
-  border-color: var(--pico-border-strong);
-  box-shadow: var(--pico-shadow);
+.ph-btn svg {
+  width: 15px;
+  height: 15px;
 }
 
-/* Cards */
+/* =========================================================
+   Live terminal (signature)
+   ========================================================= */
 
-.pico-card,
-.pico-metric-card {
-  border: 1px solid rgba(229, 231, 235, 0.95);
-  border-radius: var(--pico-radius);
-  background: var(--pico-surface);
-  box-shadow: var(--pico-shadow);
-}
-
-.pico-card {
-  padding: 24px;
-  transition:
-    box-shadow 160ms ease,
-    border-color 160ms ease;
-}
-
-.pico-card:hover {
-  border-color: var(--pico-border-strong);
-  box-shadow: var(--pico-shadow);
-}
-
-.pico-card h3 {
-  margin: 0 0 8px;
-  color: var(--pico-text);
-  font-size: 1.08rem;
-  letter-spacing: -0.03em;
-}
-
-.pico-card p {
-  margin: 0;
-  color: var(--pico-muted);
-}
-
-.pico-runtime-card {
-  align-self: stretch;
-}
-
-.pico-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-  font-weight: 800;
-}
-
-.pico-status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--pico-success);
-  box-shadow: 0 0 0 6px rgba(22, 163, 74, 0.12);
-}
-
-/* Runtime list */
-
-.pico-runtime-list,
-.pico-detail-list {
-  display: grid;
-  gap: 14px;
-  margin: 0;
-}
-
-.pico-runtime-list div,
-.pico-detail-list div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--pico-border);
-}
-
-.pico-runtime-list div:last-child,
-.pico-detail-list div:last-child {
-  border-bottom: 0;
-}
-
-.pico-runtime-list dt,
-.pico-detail-list dt {
-  color: var(--pico-muted);
-  font-size: 0.9rem;
-}
-
-.pico-runtime-list dd,
-.pico-detail-list dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 800;
-}
-
-/* Sections */
-
-.pico-section {
-  margin-top: 72px;
-}
-
-.pico-section-heading {
-  max-width: 720px;
-  margin-bottom: 24px;
-}
-
-.pico-section-heading h2 {
-  margin: 0;
-  color: var(--pico-text);
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  line-height: 1.04;
-  letter-spacing: -0.06em;
-}
-
-.pico-section-heading p {
-  margin-bottom: 10px;
-}
-
-.pico-section-heading-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
-  max-width: none;
-}
-
-.pico-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-/* Endpoints */
-
-.pico-endpoints {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.pico-endpoints a {
-  padding: 10px 13px;
-  border: 1px solid var(--pico-border);
-  border-radius: 999px;
-  background: var(--pico-surface);
-  color: var(--pico-muted);
-  box-shadow: var(--pico-shadow-sm);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 0.9rem;
-  font-weight: 700;
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
-}
-
-.pico-endpoints a:hover {
-  transform: translateY(-1px);
-  border-color: var(--pico-border-strong);
-  color: var(--pico-text);
-  box-shadow: var(--pico-shadow);
-}
-
-/* Status page */
-
-.pico-page-title {
-  padding: 24px 0 8px;
-}
-
-.pico-page-title-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.pico-page-title h1 {
-  font-size: clamp(2.5rem, 6vw, 4.8rem);
-}
-
-.pico-page-title p {
-  max-width: 720px;
-  margin: 18px 0 0;
-  font-size: 1.05rem;
-}
-
-.pico-metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.pico-metric-card {
-  padding: 18px;
-  transition:
-    box-shadow 160ms ease,
-    border-color 160ms ease;
-}
-
-.pico-metric-card:hover {
-  box-shadow: var(--pico-shadow);
-}
-
-.pico-metric-label {
-  display: block;
-  color: var(--pico-muted);
-  font-size: 0.82rem;
-  font-weight: 750;
-}
-
-.pico-metric-value {
-  display: block;
-  margin-top: 8px;
-  color: var(--pico-text);
-  font-size: clamp(1.45rem, 3vw, 2.25rem);
-  line-height: 1;
-  letter-spacing: -0.06em;
-}
-
-.pico-metric-note {
-  display: block;
-  margin-top: 10px;
-  color: var(--pico-muted);
-  font-size: 0.78rem;
-}
-
-.pico-two-columns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-/* Forms */
-
-.pico-form {
-  display: grid;
-  gap: 14px;
-  margin-top: 20px;
-}
-
-.pico-form label {
-  display: grid;
-  gap: 7px;
-  color: var(--pico-muted);
-  font-size: 0.9rem;
-  font-weight: 750;
-}
-
-.pico-form input {
-  width: 100%;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--pico-border);
-  border-radius: var(--pico-radius-sm);
-  background: var(--pico-surface-soft);
-  color: var(--pico-text);
-  outline: none;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
-}
-
-.pico-form input:focus {
-  border-color: var(--pico-primary);
-  background: var(--pico-surface);
-  box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.14);
-}
-
-/* Code output */
-
-.pico-output {
-  position: relative;
-  overflow: auto;
-  scrollbar-gutter: stable;
-  min-height: 132px;
-  max-height: 360px;
-  margin: 18px 0 0;
-  padding: 48px 18px 18px;
-  border: 1px solid #d6b980;
-  border-radius: 18px;
-  background: #25211b;
-  color: #f8ead2;
+.ph-Terminal {
+  border: 1px solid var(--ps-term-border);
+  border-radius: var(--ps-radius);
+  background: var(--ps-term-bg);
+  overflow: hidden;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 16px 34px rgba(15, 23, 42, 0.12);
-  font-family:
-    "SFMono-Regular", "Cascadia Code", "Liberation Mono", Consolas, monospace;
-  font-size: 0.84rem;
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.14);
+}
+
+.ph-Terminal__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  background: #2a251d;
+  border-bottom: 1px solid var(--ps-term-border);
+}
+
+.ph-Terminal__dots {
+  display: inline-flex;
+  gap: 7px;
+}
+
+.ph-Terminal__dots i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: block;
+}
+
+.ph-Terminal__dots i:nth-child(1) {
+  background: #ff5f57;
+}
+.ph-Terminal__dots i:nth-child(2) {
+  background: #febc2e;
+}
+.ph-Terminal__dots i:nth-child(3) {
+  background: #28c840;
+}
+
+.ph-Terminal__title {
+  color: var(--ps-term-muted);
+  font-family: var(--ps-code-font);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.ph-Terminal__live {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ps-term-muted);
+  font-size: 11px;
+  font-family: var(--ps-code-font);
+}
+
+.ph-Terminal__live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #28c840;
+  animation: ph-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes ph-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.ph-Terminal__body {
+  margin: 0;
+  padding: 16px 18px 20px;
+  min-height: 280px;
+  max-height: 360px;
+  overflow: auto;
+  font-family: var(--ps-code-font);
+  font-size: 12.5px;
   line-height: 1.65;
+  color: var(--ps-term-text);
   white-space: pre-wrap;
   word-break: break-word;
   tab-size: 2;
 }
 
-.pico-output::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+.ph-Terminal__prompt {
+  color: var(--ps-term-muted);
+}
+.ph-Terminal__cmd {
+  color: var(--ps-term-text);
+}
+.ph-Terminal__cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  vertical-align: text-bottom;
+  background: var(--ps-brand1);
+  animation: ph-caret 1s step-end infinite;
+}
+
+@keyframes ph-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* JSON token colors */
+.ph-j-key {
+  color: var(--ps-term-key);
+}
+.ph-j-str {
+  color: var(--ps-term-str);
+}
+.ph-j-num {
+  color: var(--ps-term-num);
+}
+.ph-j-bool {
+  color: var(--ps-term-bool);
+}
+.ph-j-punct {
+  color: var(--ps-term-muted);
+}
+
+/* =========================================================
+   Section scaffolding
+   ========================================================= */
+
+.ph-Section {
+  padding: 56px 0;
+  border-top: 1px solid var(--ps-border);
+}
+
+.ph-Section__head {
+  max-width: 640px;
+  margin-bottom: 28px;
+}
+
+.ph-Section__head--row {
+  max-width: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.ph-Section h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  font-weight: 650;
+  color: var(--ps-text0);
+}
+
+.ph-Section__sub {
+  margin: 8px 0 0;
+  font-size: 0.98rem;
+  color: var(--ps-text2);
+}
+
+/* Feature cards */
+
+.ph-Grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ph-Card {
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius);
+  background: var(--ps-surface);
+  padding: 20px;
+  transition:
+    border-color 0.12s,
+    transform 0.12s;
+}
+
+.ph-Card:hover {
+  border-color: var(--ps-border-strong);
+  transform: translateY(-2px);
+}
+
+.ph-Card__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
   height: 34px;
-  border-bottom: 1px solid rgba(214, 185, 128, 0.26);
-  border-radius: 18px 18px 0 0;
-  background:
-    radial-gradient(circle at 18px 17px, #ef4444 0 5px, transparent 6px),
-    radial-gradient(circle at 36px 17px, #f59e0b 0 5px, transparent 6px),
-    radial-gradient(circle at 54px 17px, #22c55e 0 5px, transparent 6px),
-    #30291f;
-  pointer-events: none;
+  border-radius: 8px;
+  background: var(--ps-brand3);
+  color: var(--ps-brand0);
+  margin-bottom: 14px;
 }
 
-.pico-output::after {
-  content: "pico-output";
-  position: absolute;
-  top: 8px;
-  right: 16px;
-  color: #d6b980;
-  font-size: 0.72rem;
-  font-weight: 750;
-  letter-spacing: 0.04em;
-  pointer-events: none;
+.ph-Card__icon svg {
+  width: 18px;
+  height: 18px;
 }
 
-.pico-output::selection {
-  background: rgba(255, 153, 0, 0.34);
-  color: #fffaf0;
+.ph-Card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--ps-text1);
 }
 
-@media (max-width: 720px) {
-  .pico-output {
-    min-height: 118px;
-    max-height: 280px;
-    padding: 46px 14px 14px;
-    border-radius: 16px;
-    font-size: 0.78rem;
-    line-height: 1.6;
-  }
-
-  .pico-output::before {
-    height: 32px;
-    border-radius: 16px 16px 0 0;
-  }
-
-  .pico-output::after {
-    right: 14px;
-    font-size: 0.68rem;
-  }
-}
-
-/* Table */
-
-.pico-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.pico-table {
-  width: 100%;
-  border-collapse: collapse;
+.ph-Card p {
+  margin: 0;
   font-size: 0.92rem;
+  color: var(--ps-text2);
+  line-height: 1.55;
 }
 
-.pico-table th,
-.pico-table td {
-  padding: 13px 12px;
-  border-bottom: 1px solid var(--pico-border);
-  text-align: left;
-  vertical-align: top;
+/* Runtime layers list */
+
+.ph-Layers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius);
+  overflow: hidden;
+  background: var(--ps-surface);
 }
 
-.pico-table th {
-  color: var(--pico-muted);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.ph-Layer {
+  display: flex;
+  gap: 13px;
+  padding: 18px 20px;
+  border-right: 1px solid var(--ps-border);
+  border-bottom: 1px solid var(--ps-border);
 }
 
-.pico-table td {
-  color: var(--pico-text);
+.ph-Layer:nth-child(2n) {
+  border-right: 0;
 }
 
-.pico-table td:nth-child(4) {
-  max-width: 420px;
-  color: var(--pico-muted);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 0.82rem;
-  word-break: break-word;
+.ph-Layer:nth-last-child(-n + 2) {
+  border-bottom: 0;
 }
 
-.pico-events-footer {
+.ph-Layer__mark {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--ps-surface-soft);
+  border: 1px solid var(--ps-border);
+  color: var(--ps-brand0);
+}
+
+.ph-Layer__mark svg {
+  width: 15px;
+  height: 15px;
+}
+
+.ph-Layer__body h4 {
+  margin: 2px 0 3px;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--ps-text1);
+}
+
+.ph-Layer__body p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--ps-text2);
+  line-height: 1.5;
+}
+
+/* Endpoints */
+
+.ph-Endpoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ph-Endpoint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-surface);
+  color: var(--ps-text2);
+  font-family: var(--ps-code-font);
+  font-size: 12.5px;
+  transition:
+    border-color 0.12s,
+    color 0.12s;
+}
+
+.ph-Endpoint:hover {
+  border-color: var(--ps-brand2);
+  color: var(--ps-text1);
+}
+
+.ph-Endpoint__verb {
+  color: var(--ps-brand0);
+  font-weight: 700;
+}
+
+/* CTA band */
+
+.ph-Band {
+  margin: 56px 0 0;
+  padding: 40px;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius);
+  background: linear-gradient(
+    180deg,
+    var(--ps-surface),
+    var(--ps-surface-soft)
+  );
+  text-align: center;
+}
+
+.ph-Band h2 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  font-weight: 680;
+  color: var(--ps-text0);
+}
+
+.ph-Band p {
+  margin: 0 auto 22px;
+  max-width: 460px;
+  color: var(--ps-text2);
+}
+
+.ph-Band__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.ph-Footer {
+  border-top: 1px solid var(--ps-border);
+  margin-top: 56px;
+}
+
+.ph-Footer__inner {
+  max-width: var(--ps-maxw);
+  margin: 0 auto;
+  padding: 28px 20px 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--pico-border);
+  flex-wrap: wrap;
+  color: var(--ps-text3);
+  font-size: 13px;
 }
 
-.pico-events-count {
-  margin: 0;
-  color: var(--pico-muted);
-  font-size: 0.9rem;
+.ph-Footer strong {
+  color: var(--ps-text2);
   font-weight: 650;
 }
 
-@media (max-width: 720px) {
-  .pico-events-footer {
-    align-items: stretch;
-    flex-direction: column;
+.ph-Footer__links {
+  display: flex;
+  gap: 14px;
+}
+
+.ph-Footer__links a:hover {
+  color: var(--ps-text1);
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 920px) {
+  .ph-Hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 48px 0 40px;
   }
-
-  .pico-events-footer .pico-button {
-    width: 100%;
-  }
-}
-
-/* Footer */
-
-.pico-footer {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 28px 0 44px;
-  border-top: 1px solid var(--pico-border);
-  color: var(--pico-muted);
-  text-align: center;
-}
-
-.pico-footer p {
-  margin: 0;
-}
-
-/* Responsive */
-
-@media (max-width: 980px) {
-  .pico-hero,
-  .pico-two-columns {
+  .ph-Grid {
     grid-template-columns: 1fr;
   }
-
-  .pico-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .pico-metrics-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 720px) {
-  :root {
-    --pico-header-height: auto;
-  }
-
-  .pico-nav {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 14px 0;
-    gap: 12px;
-  }
-
-  .pico-section-heading-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .pico-nav-links {
-    justify-content: flex-start;
-  }
-
-  .pico-main {
-    padding-top: 38px;
-  }
-
-  .pico-hero {
-    min-height: auto;
-  }
-
-  .pico-page-title-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .pico-grid,
-  .pico-metrics-grid {
+  .ph-Layers {
     grid-template-columns: 1fr;
   }
+  .ph-Layer {
+    border-right: 0;
+  }
+  .ph-Layer:nth-last-child(2) {
+    border-bottom: 1px solid var(--ps-border);
+  }
+}
 
-  .pico-actions {
+@media (max-width: 600px) {
+  .ph-AppBar__nav {
+    display: none;
+  }
+  .ph-Hero__actions .ph-btn,
+  .ph-Band__actions .ph-btn {
+    flex: 1 1 100%;
+  }
+  .ph-Section__head--row {
+    flex-direction: column;
     align-items: stretch;
-    flex-direction: column;
   }
-
-  .pico-button {
-    width: 100%;
-  }
-
-  .pico-runtime-list div,
-  .pico-detail-list div {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .pico-runtime-list dd,
-  .pico-detail-list dd {
-    text-align: left;
-  }
-
-  .pico-card {
-    padding: 20px;
+  .ph-Band {
+    padding: 28px 20px;
   }
 }
-.pico-hero-compact {
-  min-height: auto;
-  padding: 36px 0 28px;
-}
 
-.pico-section-compact {
-  margin-top: 48px;
-}
-
-.pico-grid-compact .pico-card {
-  min-height: 100%;
-}
-
-.pico-grid-compact .pico-card p {
-  font-size: 0.95rem;
-}
-
-@media (max-width: 720px) {
-  .pico-hero-compact {
-    padding-top: 18px;
-  }
-
-  .pico-section-compact {
-    margin-top: 36px;
-  }
-}
-@media (max-width: 720px) {
-  .pico-main {
-    padding-top: 0px;
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

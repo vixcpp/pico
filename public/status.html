@@ -1,34 +1,25 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Basic -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pico Status · Live Vix.cpp Runtime Dashboard</title>
+    <title>Pico Status · Live Vix.cpp runtime dashboard</title>
 
-    <!-- Primary meta -->
     <meta
       name="description"
-      content="Pico Status is a live runtime dashboard for a native C++ backend app powered by Vix.cpp. Inspect HTTP health, durable KV counters, SQLite events, ThreadPool metrics, WebSocket diagnostics, and runtime state from one page."
+      content="A live runtime dashboard for a native C++ backend powered by Vix.cpp. Inspect HTTP health, durable KV counters, SQLite events, ThreadPool metrics, and WebSocket diagnostics from one tabbed dashboard."
     />
-
     <meta name="author" content="Gaspard Kirira" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pico.vixcpp.com/status.html" />
 
-    <!-- Theme / Mobile -->
-    <meta name="theme-color" content="#101827" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f7f7f7" />
+    <meta name="color-scheme" content="light" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
     <meta name="apple-mobile-web-app-title" content="Pico Status" />
 
-    <!-- Favicons / App icons -->
     <link rel="icon" href="/assets/pwa/favicon.ico" />
     <link
       rel="icon"
@@ -47,20 +38,17 @@
       sizes="180x180"
       href="/assets/pwa/apple-touch-icon.png"
     />
-
-    <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pico" />
     <meta
       property="og:title"
-      content="Pico Status · Live Vix.cpp Runtime Dashboard"
+      content="Pico Status · Live Vix.cpp runtime dashboard"
     />
     <meta
       property="og:description"
-      content="Inspect a real native C++ backend runtime powered by Vix.cpp: HTTP health, durable KV state, SQLite events, ThreadPool metrics, WebSocket diagnostics, and live runtime state."
+      content="Inspect a real native C++ backend runtime powered by Vix.cpp: HTTP health, durable KV state, SQLite events, ThreadPool metrics, and WebSocket diagnostics."
     />
     <meta property="og:url" content="https://pico.vixcpp.com/status.html" />
     <meta
@@ -72,15 +60,14 @@
       content="Pico Status live runtime dashboard powered by Vix.cpp"
     />
 
-    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Pico Status · Live Vix.cpp Runtime Dashboard"
+      content="Pico Status · Live Vix.cpp runtime dashboard"
     />
     <meta
       name="twitter:description"
-      content="A live dashboard for a native C++ backend app powered by Vix.cpp. Inspect HTTP, KV state, SQLite events, ThreadPool metrics, and WebSocket diagnostics."
+      content="A live tabbed dashboard for a native C++ backend powered by Vix.cpp. Inspect HTTP, KV state, SQLite events, ThreadPool metrics, and WebSocket diagnostics."
     />
     <meta
       name="twitter:image"
@@ -88,503 +75,653 @@
     />
     <meta name="twitter:site" content="@vix_cpp" />
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="/app.css" />
+    <link rel="preload" as="style" href="/status.css" />
+    <link rel="stylesheet" href="/status.css" />
   </head>
 
   <body>
-    <header class="pico-header">
-      <nav class="pico-nav" aria-label="Main navigation">
-        <a class="pico-brand" href="/" aria-label="Pico home">
-          <span class="pico-brand-mark" aria-hidden="true">
+    <div class="ps" data-kernel="idle" id="ps-shell">
+      <!-- ============================== APP BAR ============================== -->
+      <header class="ps-AppBar">
+        <a class="ps-AppBar__brand" href="/" aria-label="Pico home">
+          <span class="ps-AppBar__logo" aria-hidden="true">
             <svg
-              viewBox="0 0 36 36"
+              viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <defs>
-                <linearGradient
-                  id="pico-logo-left"
-                  x1="5"
-                  y1="6"
-                  x2="18"
-                  y2="30"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0%" stop-color="#d4fcd4" />
-                  <stop offset="55%" stop-color="#4ade80" />
-                  <stop offset="100%" stop-color="#22c55e" />
-                </linearGradient>
-
-                <linearGradient
-                  id="pico-logo-right"
-                  x1="31"
-                  y1="6"
-                  x2="18"
-                  y2="30"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0%" stop-color="#22c55e" />
-                  <stop offset="100%" stop-color="#15803d" />
-                </linearGradient>
-              </defs>
-
-              <polygon
-                points="5,6 12,6 18,28 14,28"
-                fill="url(#pico-logo-left)"
-              />
-              <polygon
-                points="31,6 24,6 18,28 22,28"
-                fill="url(#pico-logo-right)"
-              />
-
-              <line
-                x1="9"
-                y1="16"
-                x2="13.5"
-                y2="29"
-                stroke="#bbf7d0"
-                stroke-width="1.1"
+              <path
+                d="M6 5L11 19"
+                stroke="#fff"
+                stroke-width="2.2"
                 stroke-linecap="round"
-                opacity="0.7"
+              />
+              <path
+                d="M18 5L13 19"
+                stroke="#fff"
+                stroke-width="2.2"
+                stroke-linecap="round"
               />
             </svg>
           </span>
-
-          <span class="pico-brand-text">Pico</span>
+          <span class="ps-AppBar__title"
+            >Pico<span class="ps-AppBar__sub"> / status</span></span
+          >
         </a>
 
-        <div class="pico-nav-links">
+        <nav class="ps-AppBar__nav" aria-label="Site">
           <a href="/">Home</a>
-          <a href="/status.html" aria-current="page">Status</a>
           <a href="/api/status">Runtime JSON</a>
           <a href="/api/events">Events JSON</a>
-        </div>
-      </nav>
-    </header>
+        </nav>
 
-    <main class="pico-main">
-      <section class="pico-page-title">
-        <p class="pico-eyebrow">Runtime dashboard</p>
+        <span class="ps-AppBar__spacer"></span>
 
-        <div class="pico-page-title-row">
-          <div>
-            <h1>Pico status</h1>
-            <p>
-              Inspect the live state of a native C++ backend powered by Vix.cpp:
-              HTTP health, durable counters, SQLite events, ThreadPool metrics,
-              and WebSocket diagnostics.
-            </p>
-          </div>
+        <div class="ps-AppBar__status">
+          <span class="ps-Kernel" title="Runtime activity">
+            <span class="ps-Kernel__dot"></span>
+            <span class="ps-Kernel__text" id="kernel-text">Idle</span>
+          </span>
 
-          <button class="pico-button pico-button-primary" id="refresh-status">
+          <button class="ps-AppBar__refresh" id="refresh-status" type="button">
             Refresh
           </button>
         </div>
-      </section>
+      </header>
 
-      <section class="pico-section" aria-labelledby="overview-title">
-        <div class="pico-section-heading">
-          <p class="pico-eyebrow">Overview</p>
-          <h2 id="overview-title">Runtime snapshot</h2>
-        </div>
-
-        <div class="pico-metrics-grid">
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">Health</span>
-            <strong class="pico-metric-value" id="metric-health">
-              Loading
-            </strong>
-            <span class="pico-metric-note" id="metric-health-note">
-              Waiting for /api/health
-            </span>
-          </article>
-
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">Uptime</span>
-            <strong class="pico-metric-value" id="metric-uptime">—</strong>
-            <span class="pico-metric-note">seconds</span>
-          </article>
-
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">Boot count</span>
-            <strong class="pico-metric-value" id="metric-boot-count">—</strong>
-            <span class="pico-metric-note">persisted in KV</span>
-          </article>
-
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">Events</span>
-            <strong class="pico-metric-value" id="metric-events">—</strong>
-            <span class="pico-metric-note">stored in SQLite</span>
-          </article>
-
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">HTTP requests</span>
-            <strong class="pico-metric-value" id="metric-http">—</strong>
-            <span class="pico-metric-note">durable counter</span>
-          </article>
-
-          <article class="pico-metric-card">
-            <span class="pico-metric-label">WebSocket messages</span>
-            <strong class="pico-metric-value" id="metric-ws">—</strong>
-            <span class="pico-metric-note">runtime counter</span>
-          </article>
-        </div>
-      </section>
-
-      <section
-        class="pico-section pico-two-columns"
-        aria-label="Runtime details"
+      <!-- ============================== TABS ============================== -->
+      <nav
+        class="ps-Tabs"
+        role="tablist"
+        aria-label="Dashboard sections"
+        id="ps-tabs"
       >
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span class="pico-status-dot"></span>
-            <span>Application runtime</span>
+        <button
+          class="ps-Tab is-active"
+          role="tab"
+          aria-selected="true"
+          data-tab="overview"
+          id="tab-overview"
+          aria-controls="panel-overview"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Overview
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="kv"
+          id="tab-kv"
+          aria-controls="panel-kv"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M3 5v14a9 3 0 0 0 18 0V5" />
+            <path d="M3 12a9 3 0 0 0 18 0" />
+          </svg>
+          KV
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="jobs"
+          id="tab-jobs"
+          aria-controls="panel-jobs"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+          Jobs
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="auth"
+          id="tab-auth"
+          aria-controls="panel-auth"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          Auth
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="pdf"
+          id="tab-pdf"
+          aria-controls="panel-pdf"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            />
+            <path d="M14 2v6h6" />
+          </svg>
+          PDF
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="ws"
+          id="tab-ws"
+          aria-controls="panel-ws"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <line x1="12" y1="20" x2="12.01" y2="20" />
+          </svg>
+          WebSocket
+        </button>
+        <button
+          class="ps-Tab"
+          role="tab"
+          aria-selected="false"
+          data-tab="events"
+          id="tab-events"
+          aria-controls="panel-events"
+        >
+          <svg
+            class="ps-Tab__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+          Events
+          <span class="ps-Tab__badge" id="events-badge">—</span>
+        </button>
+      </nav>
+
+      <!-- ============================== BODY ============================== -->
+      <main class="ps-Body">
+        <!-- ---------- OVERVIEW ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-overview"
+          aria-labelledby="tab-overview"
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">Runtime snapshot</h1>
+            <p class="ps-Panel__desc">
+              Health, durable counters, and ThreadPool state for the running
+              Vix.cpp process.
+            </p>
           </div>
 
-          <dl class="pico-detail-list">
-            <div>
-              <dt>App</dt>
-              <dd id="detail-app">—</dd>
-            </div>
-
-            <div>
-              <dt>Runtime</dt>
-              <dd id="detail-runtime">—</dd>
-            </div>
-
-            <div>
-              <dt>Status</dt>
-              <dd id="detail-status">—</dd>
-            </div>
-
-            <div>
-              <dt>Last heartbeat</dt>
-              <dd id="detail-heartbeat">—</dd>
-            </div>
-          </dl>
-        </article>
-
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span class="pico-status-dot"></span>
-            <span>ThreadPool</span>
-          </div>
-
-          <dl class="pico-detail-list">
-            <div>
-              <dt>Running</dt>
-              <dd id="threadpool-running">—</dd>
-            </div>
-
-            <div>
-              <dt>Workers</dt>
-              <dd id="threadpool-workers">—</dd>
-            </div>
-
-            <div>
-              <dt>Pending</dt>
-              <dd id="threadpool-pending">—</dd>
-            </div>
-
-            <div>
-              <dt>Completed</dt>
-              <dd id="threadpool-completed">—</dd>
-            </div>
-
-            <div>
-              <dt>Failed</dt>
-              <dd id="threadpool-failed">—</dd>
-            </div>
-          </dl>
-        </article>
-      </section>
-
-      <section
-        class="pico-section pico-two-columns"
-        aria-label="Interactive runtime checks"
-      >
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span>KV check</span>
-          </div>
-
-          <p class="pico-muted">
-            Write a value to Pico's durable KV store, then read it back through
-            the API.
-          </p>
-
-          <form class="pico-form" id="kv-form">
-            <label>
-              Key
-              <input
-                id="kv-key"
-                name="key"
-                type="text"
-                value="demo-status-message"
-                autocomplete="off"
-              />
-            </label>
-
-            <label>
-              Value
-              <input
-                id="kv-value"
-                name="value"
-                type="text"
-                value="Hello from Pico status page"
-                autocomplete="off"
-              />
-            </label>
-
-            <button class="pico-button pico-button-secondary" type="submit">
-              Write and read KV
-            </button>
-          </form>
-
-          <pre class="pico-output" id="kv-output">Waiting for KV test…</pre>
-        </article>
-
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span>Job check</span>
-          </div>
-
-          <p class="pico-muted">
-            Submit a small diagnostic job to the Vix ThreadPool through Pico's
-            job service.
-          </p>
-
-          <form class="pico-form" id="job-form">
-            <label>
-              Job name
-              <input
-                id="job-name"
-                name="name"
-                type="text"
-                value="status-page-job"
-                autocomplete="off"
-              />
-            </label>
-
-            <label>
-              Value
-              <input id="job-value" name="value" type="number" value="21" />
-            </label>
-
-            <button class="pico-button pico-button-secondary" type="submit">
-              Run job
-            </button>
-          </form>
-
-          <pre class="pico-output" id="job-output">Waiting for job test…</pre>
-        </article>
-      </section>
-
-      <section
-        class="pico-section pico-two-columns"
-        aria-label="Rix package diagnostics"
-      >
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span>Auth check</span>
-          </div>
-
-          <p class="pico-muted">
-            Register, login, validate a session, logout, and delete the current
-            diagnostic account through rix/auth using Pico's database-backed
-            auth service.
-          </p>
-
-          <form class="pico-form" id="auth-form">
-            <label>
-              Email
-              <input
-                id="auth-email"
-                name="email"
-                type="email"
-                value="pico-demo@example.com"
-                autocomplete="off"
-              />
-            </label>
-
-            <label>
-              Password
-              <input
-                id="auth-password"
-                name="password"
-                type="password"
-                value="correct-password"
-                autocomplete="off"
-              />
-            </label>
-
-            <div class="pico-actions">
-              <button
-                class="pico-button pico-button-secondary"
-                id="auth-register-button"
-                type="button"
+          <div class="ps-metrics">
+            <article class="ps-metric">
+              <span class="ps-metric__label">Health</span>
+              <strong class="ps-metric__value" id="metric-health"
+                >Loading</strong
               >
-                Register
-              </button>
-
-              <button
-                class="pico-button pico-button-secondary"
-                id="auth-login-button"
-                type="button"
+              <span class="ps-metric__note" id="metric-health-note"
+                >Waiting for /api/health</span
               >
-                Login
-              </button>
+            </article>
+            <article class="ps-metric">
+              <span class="ps-metric__label">Uptime</span>
+              <strong class="ps-metric__value" id="metric-uptime">—</strong>
+              <span class="ps-metric__note">seconds</span>
+            </article>
+            <article class="ps-metric">
+              <span class="ps-metric__label">Boot count</span>
+              <strong class="ps-metric__value" id="metric-boot-count">—</strong>
+              <span class="ps-metric__note">persisted in KV</span>
+            </article>
+            <article class="ps-metric">
+              <span class="ps-metric__label">Events</span>
+              <strong class="ps-metric__value" id="metric-events">—</strong>
+              <span class="ps-metric__note">stored in SQLite</span>
+            </article>
+            <article class="ps-metric">
+              <span class="ps-metric__label">HTTP requests</span>
+              <strong class="ps-metric__value" id="metric-http">—</strong>
+              <span class="ps-metric__note">durable counter</span>
+            </article>
+            <article class="ps-metric">
+              <span class="ps-metric__label">WS messages</span>
+              <strong class="ps-metric__value" id="metric-ws">—</strong>
+              <span class="ps-metric__note">runtime counter</span>
+            </article>
+          </div>
 
-              <button
-                class="pico-button pico-button-secondary"
-                id="auth-check-button"
-                type="button"
-              >
-                Check session
-              </button>
+          <div class="ps-two">
+            <article class="ps-card">
+              <div class="ps-card__head">
+                <span class="ps-dot"></span>Application runtime
+              </div>
+              <dl class="ps-list">
+                <div>
+                  <dt>App</dt>
+                  <dd id="detail-app">—</dd>
+                </div>
+                <div>
+                  <dt>Runtime</dt>
+                  <dd id="detail-runtime">—</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd id="detail-status">—</dd>
+                </div>
+                <div>
+                  <dt>Last heartbeat</dt>
+                  <dd id="detail-heartbeat">—</dd>
+                </div>
+              </dl>
+            </article>
 
-              <button
-                class="pico-button pico-button-secondary"
-                id="auth-logout-button"
-                type="button"
-              >
-                Logout
-              </button>
+            <article class="ps-card">
+              <div class="ps-card__head">
+                <span class="ps-dot"></span>ThreadPool
+              </div>
+              <dl class="ps-list">
+                <div>
+                  <dt>Running</dt>
+                  <dd id="threadpool-running">—</dd>
+                </div>
+                <div>
+                  <dt>Workers</dt>
+                  <dd id="threadpool-workers">—</dd>
+                </div>
+                <div>
+                  <dt>Pending</dt>
+                  <dd id="threadpool-pending">—</dd>
+                </div>
+                <div>
+                  <dt>Completed</dt>
+                  <dd id="threadpool-completed">—</dd>
+                </div>
+                <div>
+                  <dt>Failed</dt>
+                  <dd id="threadpool-failed">—</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+        </section>
 
-              <button
-                class="pico-button pico-button-secondary"
-                id="auth-delete-button"
-                type="button"
+        <!-- ---------- KV ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-kv"
+          aria-labelledby="tab-kv"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">KV store</h1>
+            <p class="ps-Panel__desc">
+              Write a value to Pico's durable KV store, then read it back
+              through the API.
+            </p>
+          </div>
+
+          <article class="ps-card">
+            <form class="ps-form" id="kv-form">
+              <label
+                >Key
+                <input
+                  id="kv-key"
+                  name="key"
+                  type="text"
+                  value="demo-status-message"
+                  autocomplete="off"
+                />
+              </label>
+              <label
+                >Value
+                <input
+                  id="kv-value"
+                  name="value"
+                  type="text"
+                  value="Hello from Pico status page"
+                  autocomplete="off"
+                />
+              </label>
+              <div class="ps-actions">
+                <button class="ps-btn ps-btn--primary" type="submit">
+                  Write and read KV
+                </button>
+              </div>
+            </form>
+            <pre class="ps-output" id="kv-output" data-label="kv">
+Waiting for KV test…</pre
+            >
+          </article>
+        </section>
+
+        <!-- ---------- JOBS ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-jobs"
+          aria-labelledby="tab-jobs"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">Background jobs</h1>
+            <p class="ps-Panel__desc">
+              Submit a diagnostic job to the Vix ThreadPool through Pico's job
+              service and watch it run.
+            </p>
+          </div>
+
+          <article class="ps-card">
+            <form class="ps-form" id="job-form">
+              <label
+                >Job name
+                <input
+                  id="job-name"
+                  name="name"
+                  type="text"
+                  value="status-page-job"
+                  autocomplete="off"
+                />
+              </label>
+              <label
+                >Value
+                <input id="job-value" name="value" type="number" value="21" />
+              </label>
+              <div class="ps-actions">
+                <button class="ps-btn ps-btn--primary" type="submit">
+                  Run job
+                </button>
+              </div>
+            </form>
+            <pre class="ps-output" id="job-output" data-label="jobs">
+Waiting for job test…</pre
+            >
+          </article>
+        </section>
+
+        <!-- ---------- AUTH ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-auth"
+          aria-labelledby="tab-auth"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">Auth (rix/auth)</h1>
+            <p class="ps-Panel__desc">
+              Register, login, validate a session, logout, and delete the
+              diagnostic account through the database-backed auth service.
+            </p>
+          </div>
+
+          <article class="ps-card">
+            <form class="ps-form" id="auth-form">
+              <label
+                >Email
+                <input
+                  id="auth-email"
+                  name="email"
+                  type="email"
+                  value="pico-demo@example.com"
+                  autocomplete="off"
+                />
+              </label>
+              <label
+                >Password
+                <input
+                  id="auth-password"
+                  name="password"
+                  type="password"
+                  value="correct-password"
+                  autocomplete="off"
+                />
+              </label>
+              <div class="ps-actions">
+                <button class="ps-btn" id="auth-register-button" type="button">
+                  Register
+                </button>
+                <button class="ps-btn" id="auth-login-button" type="button">
+                  Login
+                </button>
+                <button class="ps-btn" id="auth-check-button" type="button">
+                  Check session
+                </button>
+                <button class="ps-btn" id="auth-logout-button" type="button">
+                  Logout
+                </button>
+                <button
+                  class="ps-btn ps-btn--danger"
+                  id="auth-delete-button"
+                  type="button"
+                >
+                  Delete account
+                </button>
+              </div>
+            </form>
+            <pre class="ps-output" id="auth-output" data-label="rix/auth">
+Waiting for auth test…</pre
+            >
+          </article>
+        </section>
+
+        <!-- ---------- PDF ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-pdf"
+          aria-labelledby="tab-pdf"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">PDF (rix/pdf)</h1>
+            <p class="ps-Panel__desc">
+              Generate PDF files through rix/pdf from live Pico routes.
+            </p>
+          </div>
+
+          <article class="ps-card">
+            <div class="ps-actions">
+              <a class="ps-btn ps-btn--primary" href="/api/pdf/basic"
+                >Download basic PDF</a
               >
-                Delete account
-              </button>
+              <a class="ps-btn" href="/api/pdf/events">Download events PDF</a>
             </div>
-          </form>
-
-          <pre class="pico-output" id="auth-output">Waiting for auth test…</pre>
-        </article>
-
-        <article class="pico-card">
-          <div class="pico-card-header">
-            <span>PDF check</span>
-          </div>
-
-          <p class="pico-muted">
-            Generate PDF files through rix/pdf from live Pico routes.
-          </p>
-
-          <div class="pico-actions">
-            <a class="pico-button pico-button-secondary" href="/api/pdf/basic">
-              Download basic PDF
-            </a>
-
-            <a class="pico-button pico-button-secondary" href="/api/pdf/events">
-              Download events PDF
-            </a>
-          </div>
-
-          <pre class="pico-output" id="pdf-output">
+            <pre class="ps-output" id="pdf-output" data-label="rix/pdf">
 PDF routes are ready:
 GET /api/pdf/basic
 GET /api/pdf/events</pre
-          >
-        </article>
-      </section>
-
-      <section class="pico-section" aria-labelledby="ws-title">
-        <div class="pico-section-heading">
-          <p class="pico-eyebrow">Realtime</p>
-          <h2 id="ws-title">WebSocket diagnostics</h2>
-        </div>
-
-        <article class="pico-card">
-          <p class="pico-muted">
-            Test the WebSocket runtime and inspect diagnostic information from
-            the browser.
-          </p>
-
-          <div class="pico-actions">
-            <button
-              class="pico-button pico-button-secondary"
-              id="ws-info-button"
-              type="button"
             >
-              Load WS info
-            </button>
+          </article>
+        </section>
 
-            <button
-              class="pico-button pico-button-secondary"
-              id="ws-connect-button"
-              type="button"
-            >
-              Test WebSocket
-            </button>
-          </div>
-
-          <pre class="pico-output" id="ws-output">
-Waiting for WebSocket check…</pre
-          >
-        </article>
-      </section>
-
-      <section class="pico-section" aria-labelledby="events-title">
-        <div class="pico-section-heading pico-section-heading-row">
-          <div>
-            <p class="pico-eyebrow">SQLite events</p>
-            <h2 id="events-title">Latest runtime events</h2>
-          </div>
-
-          <a class="pico-button pico-button-secondary" href="/api/events.csv">
-            Download CSV
-          </a>
-        </div>
-
-        <article class="pico-card">
-          <div class="pico-table-wrap">
-            <table class="pico-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Source</th>
-                  <th>Type</th>
-                  <th>Payload</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-
-              <tbody id="events-table-body">
-                <tr>
-                  <td colspan="5">Loading events…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="pico-events-footer">
-            <p class="pico-events-count" id="events-count">
-              Showing latest runtime events
+        <!-- ---------- WEBSOCKET ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-ws"
+          aria-labelledby="tab-ws"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">WebSocket diagnostics</h1>
+            <p class="ps-Panel__desc">
+              Inspect WebSocket runtime info and run a live connection test from
+              the browser.
             </p>
-
-            <button
-              class="pico-button pico-button-secondary"
-              id="load-more-events"
-              type="button"
-            >
-              Load more events
-            </button>
           </div>
-        </article>
-      </section>
-    </main>
 
-    <footer class="pico-footer">
-      <p>
-        Pico status page powered by
-        <strong>Vix.cpp</strong>.
-      </p>
-    </footer>
+          <article class="ps-card">
+            <div class="ps-actions">
+              <button class="ps-btn" id="ws-info-button" type="button">
+                Load WS info
+              </button>
+              <button
+                class="ps-btn ps-btn--primary"
+                id="ws-connect-button"
+                type="button"
+              >
+                Test WebSocket
+              </button>
+            </div>
+            <pre class="ps-output" id="ws-output" data-label="ws">
+Waiting for WebSocket check…</pre
+            >
+          </article>
+        </section>
+
+        <!-- ---------- EVENTS ---------- -->
+        <section
+          class="ps-Panel"
+          role="tabpanel"
+          id="panel-events"
+          aria-labelledby="tab-events"
+          hidden
+        >
+          <div class="ps-Panel__head">
+            <h1 class="ps-Panel__title">Runtime events</h1>
+            <p class="ps-Panel__desc">
+              The latest events recorded in SQLite. Load more to page through
+              history, or download the full log as CSV.
+            </p>
+          </div>
+
+          <article class="ps-card">
+            <div class="ps-actions" style="margin-bottom: 14px">
+              <a class="ps-btn" href="/api/events.csv">Download CSV</a>
+            </div>
+
+            <div class="ps-table-wrap">
+              <table class="ps-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Source</th>
+                    <th>Type</th>
+                    <th>Payload</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="events-table-body">
+                  <tr>
+                    <td colspan="5">Loading events…</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ps-events-footer">
+              <p class="ps-events-count" id="events-count">
+                Showing latest runtime events
+              </p>
+              <button class="ps-btn" id="load-more-events" type="button">
+                Load more events
+              </button>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <!-- ============================== STATUS BAR ============================== -->
+      <footer class="ps-StatusBar">
+        <div class="ps-StatusBar__group">
+          <span class="ps-StatusBar__item">
+            <span class="ps-StatusBar__dot"></span>
+            <span class="ps-StatusBar__kernelText" id="statusbar-kernel"
+              >Idle</span
+            >
+          </span>
+          <span class="ps-StatusBar__sep">·</span>
+          <span class="ps-StatusBar__item">Vix.cpp</span>
+          <span class="ps-StatusBar__sep">·</span>
+          <span class="ps-StatusBar__item" id="statusbar-app">pico</span>
+        </div>
+
+        <div class="ps-StatusBar__group ps-StatusBar__group--right">
+          <span class="ps-StatusBar__item" id="statusbar-uptime">uptime —</span>
+          <span class="ps-StatusBar__sep">·</span>
+          <span class="ps-StatusBar__item" id="statusbar-events">0 events</span>
+          <span class="ps-StatusBar__sep">·</span>
+          <span
+            class="ps-StatusBar__item ps-StatusBar__item--host"
+            id="statusbar-host"
+            >—</span
+          >
+        </div>
+      </footer>
+    </div>
 
     <script src="/app.js" defer></script>
+    <script src="/status.js" defer></script>
   </body>
 </html>
